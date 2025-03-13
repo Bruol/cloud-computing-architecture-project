@@ -8,7 +8,7 @@ import time
 from kubernetes import client, config
 
 MCPERF_CLIENT_CMD = "cd memcache-perf && ./mcperf -T 8 -A"
-MCPERF_LOAD_DATA_CMD = "cd memcache-perf && ./mcperf -s MEMCACHED_IP --loadonly"
+MCPERF_LOAD_DATA_CMD = "cd memcache-perf && ./mcperf -s {MEMCACHED_IP} --loadonly"
 MCPERF_BENCHMARK_CMD_TEMPLATE = "cd memcache-perf && ./mcperf -s {MEMCACHED_IP} -a {INTERNAL_AGENT_IP} --noload -T 8 -C 8 -D 4 -Q 1000 -c 8 -t 5 -w 2 --scan 5000:80000:5000"
 
 
@@ -160,12 +160,14 @@ def run_memcached_benchmark(node_name_prefix: str, memcached_ip: str, internal_a
         raise ValueError(f"Node with prefix {node_name_prefix} not found")
 
     print(f"Running memcached benchmark on {found_node.metadata.name}")
+    # create log file and directory if it doesn't exist
+    os.makedirs(os.path.dirname(log_file), exist_ok=True)
 
     command = MCPERF_BENCHMARK_CMD_TEMPLATE.format(
         MEMCACHED_IP=memcached_ip,
         INTERNAL_AGENT_IP=internal_agent_ip
     )
-    
+
     
     # Run the benchmark and capture output
     process = subprocess.Popen(
@@ -218,23 +220,24 @@ def start_interference(interference_pattern: InterferencePattern):
     if interference_pattern == InterferencePattern.NONE:
         return
     elif interference_pattern == InterferencePattern.CPU:
-        subprocess.run(["kubectl", "create", "-f", "interference/ibench-cpu.yaml"], check=True)
+        subprocess.run(["kubectl", "create", "-f", "../interference/ibench-cpu.yaml"], check=True)
     elif interference_pattern == InterferencePattern.L1D:
-        subprocess.run(["kubectl", "create", "-f", "interference/ibench-l1d.yaml"], check=True)
+        subprocess.run(["kubectl", "create", "-f", "../interference/ibench-l1d.yaml"], check=True)
     elif interference_pattern == InterferencePattern.L1I:
-        subprocess.run(["kubectl", "create", "-f", "interference/ibench-l1i.yaml"], check=True)
+        subprocess.run(["kubectl", "create", "-f", "../interference/ibench-l1i.yaml"], check=True)
     elif interference_pattern == InterferencePattern.L2:
-        subprocess.run(["kubectl", "create", "-f", "interference/ibench-l2.yaml"], check=True)
+        subprocess.run(["kubectl", "create", "-f", "../interference/ibench-l2.yaml"], check=True)
     elif interference_pattern == InterferencePattern.LLC:
-        subprocess.run(["kubectl", "create", "-f", "interference/ibench-llc.yaml"], check=True)
+        subprocess.run(["kubectl", "create", "-f", "../interference/ibench-llc.yaml"], check=True)
     elif interference_pattern == InterferencePattern.MEMBW:
-        subprocess.run(["kubectl", "create", "-f", "interference/ibench-membw.yaml"], check=True)
-
+        subprocess.run(["kubectl", "create", "-f", "../interference/ibench-membw.yaml"], check=True)
+    print(f"Waiting for pod to start")
     # spin while pod is starting
     while True:
-        pods = subprocess.run(["kubectl", "get", "pods", "-o", "jsonpath={.items[?(@.metadata.name=='ibench-cpu')].status.phase}"], check=True, capture_output=True, text=True)
+        pods = subprocess.run(["kubectl", "get", "pods", "-o", "jsonpath={.items[?(@.metadata.name=='ibench-" + interference_pattern.value + "')].status.phase}"], check=True, capture_output=True, text=True)
         if pods.stdout == "Running":
             break
+        print(f"Pod status: {pods.stdout}")
         time.sleep(1)
     print(f"Pod started with {interference_pattern} interference")
     time.sleep(10)
@@ -245,23 +248,26 @@ def stop_interference(interference_pattern: InterferencePattern):
     if interference_pattern == InterferencePattern.NONE:
         return
     elif interference_pattern == InterferencePattern.CPU:
-        subprocess.run(["kubectl", "delete", "-f", "interference/ibench-cpu.yaml"], check=True)
+        subprocess.run(["kubectl", "delete", "-f", "../interference/ibench-cpu.yaml"], check=True)
     elif interference_pattern == InterferencePattern.L1D:
-        subprocess.run(["kubectl", "delete", "-f", "interference/ibench-l1d.yaml"], check=True)
+        subprocess.run(["kubectl", "delete", "-f", "../interference/ibench-l1d.yaml"], check=True)
     elif interference_pattern == InterferencePattern.L1I:
-        subprocess.run(["kubectl", "delete", "-f", "interference/ibench-l1i.yaml"], check=True)    
+        subprocess.run(["kubectl", "delete", "-f", "../interference/ibench-l1i.yaml"], check=True)    
     elif interference_pattern == InterferencePattern.L2:
-        subprocess.run(["kubectl", "delete", "-f", "interference/ibench-l2.yaml"], check=True)
+        subprocess.run(["kubectl", "delete", "-f", "../interference/ibench-l2.yaml"], check=True)
     elif interference_pattern == InterferencePattern.LLC:
-        subprocess.run(["kubectl", "delete", "-f", "interference/ibench-llc.yaml"], check=True)
+        subprocess.run(["kubectl", "delete", "-f", "../interference/ibench-llc.yaml"], check=True)
     elif interference_pattern == InterferencePattern.MEMBW:
-        subprocess.run(["kubectl", "delete", "-f", "interference/ibench-membw.yaml"], check=True)
+        subprocess.run(["kubectl", "delete", "-f", "../interference/ibench-membw.yaml"], check=True)
+    print(f"Waiting for pod to stop")
     # spin while pod is stopping
     while True:
-        pods = subprocess.run(["kubectl", "get", "pods", "-o", "jsonpath={.items[?(@.metadata.name=='ibench-cpu')].status.phase}"], check=True, capture_output=True, text=True)
+        pods = subprocess.run(["kubectl", "get", "pods", "-o", "jsonpath={.items[?(@.metadata.name=='ibench-" + interference_pattern.value + "')].status.phase}"], check=True, capture_output=True, text=True)
         if pods.stdout == "Terminating":
+            print(f"Pod status: {pods.stdout}")
+            time.sleep(1)
+        else:
             break
-        time.sleep(1)
     print(f"Pod stopped with {interference_pattern.value} interference")
     print(f"Waiting for 10 seconds before starting next benchmark")
     time.sleep(10)
@@ -283,11 +289,13 @@ def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Run Part 1 of the Cloud Computing Architecture project')
     parser.add_argument('mode', type=str, help='Mode of operation: i/install/1, c/client/2, b/benchmark/3')
+    parser.add_argument('--memcached-ip', type=str, help='IP address of memcached server', default='100.96.3.2')
     args = parser.parse_args()
 
     try:
         mode = parse_mode(args.mode)
-        memcached_ip = "100.96.2.3"  # Hardcoded for now
+        memcached_ip = "100.96.3.2"  # Hardcoded for now
+          
         internal_agent_ip = get_internal_agent_ip()
 
         if mode == Mode.INSTALL:
@@ -296,7 +304,7 @@ def main():
             print("Installing mcperf on client-measure...")
             install_mcperf("client-measure")
             print("Loading data into memcached...")
-            load_memcached_data("client-agent", memcached_ip)
+            load_memcached_data("client-measure", memcached_ip)
 
         elif mode == Mode.CLIENT:
             print("Starting memcached client...")
@@ -306,7 +314,9 @@ def main():
             for interference_pattern in InterferencePattern:
                 start_interference(interference_pattern)
                 for i in range(0, 3):
-                    run_memcached_benchmark("client-measure", memcached_ip, internal_agent_ip, f"part1/logs/benchmark_results_{interference_pattern.value}_{i}.txt")
+                    run_memcached_benchmark("client-measure", memcached_ip, internal_agent_ip, f"logs/benchmark_results_{interference_pattern.value}_{i}.txt")
+                    print("waiting 60 seconds before next benchmark")
+                    time.sleep(60)
                 stop_interference(interference_pattern)
             print(f"\nFinished memcached benchmark with {interference_pattern.value} interference\n\n")
       

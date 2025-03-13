@@ -59,4 +59,15 @@ Then run the command bellow to run the test suite. Do not stop the client before
 python run_part_1.py benchmark
 ```
 
-This will generate the logs in the `part1/logs` folder.
+This will save the logs of the client-measure server in the `part1/logs` folder.
+
+This will run 3 iterations of each interference pattern in
+
+- NONE
+- CPU
+- L1D
+- L1I
+- L2
+- LLC
+
+Further the script will wait 60s between each run to ensure a particular run is not influenced by any previous runs. And it will wait until previous pods running interferences are terminated.
