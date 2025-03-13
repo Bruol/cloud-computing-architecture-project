@@ -1,1 +1,4 @@
 .local
+venv/*
+launch.json
+settings.json

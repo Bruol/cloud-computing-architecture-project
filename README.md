@@ -2,7 +2,7 @@
 
 This repository contains starter code for the Cloud Computing Architecture course project at ETH Zurich. Students will explore how to schedule latency-sensitive and batch applications in a cloud cluster. Please follow the instructions in the project handout.
 
-## Timeline
+## Time-line
 
 Starting from 17 March 2025
 
@@ -27,7 +27,7 @@ chmod +x ssh-k8s.sh
 
 **Output:**
 
-```
+```bash
 Available nodes:
 1. client-agent-wtvv
 2. client-measure-9m4h
