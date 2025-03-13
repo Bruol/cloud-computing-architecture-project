@@ -35,3 +35,28 @@ Available nodes:
 4. memcache-server-59cc
 Select a node number to connect to:
 ```
+
+## Run Part 1
+
+Follow the instructions in the handout and run memcached.
+
+Then run the command bellow to install memperf and load data into memcached.
+
+```bash
+cd part1
+python run_part_1.py install
+```
+
+Then run the command bellow to run the client
+
+```bash
+python run_part_1.py client
+```
+
+Then run the command bellow to run the test suite. Do not stop the client before running this command.
+
+```bash
+python run_part_1.py benchmark
+```
+
+This will generate the logs in the `part1/logs` folder.

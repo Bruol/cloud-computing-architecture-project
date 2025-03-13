@@ -238,7 +238,7 @@ def start_interference(interference_pattern: InterferencePattern):
         time.sleep(1)
     print(f"Pod started with {interference_pattern} interference")
     time.sleep(10)
-    print(f"Waiting for 10 seconds before starting benchmark")
+    print("Waiting for 10 seconds before starting benchmark")
     
 def stop_interference(interference_pattern: InterferencePattern):
     """Stop the interference on the given node."""
@@ -306,7 +306,7 @@ def main():
             for interference_pattern in InterferencePattern:
                 start_interference(interference_pattern)
                 for i in range(0, 3):
-                    run_memcached_benchmark("client-measure", memcached_ip, internal_agent_ip, f"benchmark_results_{interference_pattern.value}_{i}.txt")
+                    run_memcached_benchmark("client-measure", memcached_ip, internal_agent_ip, f"part1/logs/benchmark_results_{interference_pattern.value}_{i}.txt")
                 stop_interference(interference_pattern)
             print(f"\nFinished memcached benchmark with {interference_pattern.value} interference\n\n")
       
