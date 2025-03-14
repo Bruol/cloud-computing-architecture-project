@@ -42,6 +42,12 @@ Follow the instructions in the handout and run memcached.
 
 Then run the command bellow to install memperf and load data into memcached.
 
+The `memcached_ip` is hardcoded for now in the script. Keep in mind to replace with updated `ip`
+
+```bash
+kubectl get pods -o wide
+```
+
 ```bash
 cd part1
 python run_part_1.py install
@@ -69,5 +75,6 @@ This will run 3 iterations of each interference pattern in
 - L1I
 - L2
 - LLC
+- MEMBW
 
 Further the script will wait 60s between each run to ensure a particular run is not influenced by any previous runs. And it will wait until previous pods running interferences are terminated.

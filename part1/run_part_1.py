@@ -18,8 +18,10 @@ ZONE = "europe-west1-b"
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 INSTALL_SCRIPT_PATH = os.path.join(SCRIPT_DIR, "install_mcperf.sh")
 
+
 class InterferencePattern(enum.Enum):
     """Enum for the different interference patterns."""
+
     NONE = "none"
     CPU = "cpu"
     L1D = "l1d"
@@ -28,15 +30,19 @@ class InterferencePattern(enum.Enum):
     LLC = "llc"
     MEMBW = "membw"
 
+
 class Mode(enum.Enum):
     """Enum for the different modes of operation."""
+
     INSTALL = "install"
     CLIENT = "client"
     BENCHMARK = "benchmark"
 
+
 # Initialize Kubernetes client
 config.load_kube_config()
 kubernetes_client = client.CoreV1Api()
+
 
 def install_mcperf(node_name_prefix: str):
     """Install and configure mcperf with the given name prefix."""
@@ -61,10 +67,10 @@ def install_mcperf(node_name_prefix: str):
         stderr=subprocess.PIPE,
         text=True,
         bufsize=1,
-        universal_newlines=True
+        universal_newlines=True,
     )
     for line in process.stdout:
-        print(line, end='')
+        print(line, end="")
     process.wait()
     if process.returncode != 0:
         print(f"Error copying script: {process.stderr.read()}")
@@ -78,14 +84,15 @@ def install_mcperf(node_name_prefix: str):
         stderr=subprocess.PIPE,
         text=True,
         bufsize=1,
-        universal_newlines=True
+        universal_newlines=True,
     )
     for line in process.stdout:
-        print(line, end='')
+        print(line, end="")
     process.wait()
     if process.returncode != 0:
         print(f"Error running script: {process.stderr.read()}")
     print(f"Finished running mcperf-install script on {found_node.metadata.name}")
+
 
 def run_memcached_client(node_name_prefix: str):
     """Start the memcached client on the given node."""
@@ -108,14 +115,15 @@ def run_memcached_client(node_name_prefix: str):
         stderr=subprocess.PIPE,
         text=True,
         bufsize=1,
-        universal_newlines=True
+        universal_newlines=True,
     )
     for line in process.stdout:
-        print(line, end='')
+        print(line, end="")
     process.wait()
     if process.returncode != 0:
         print(f"Error running script: {process.stderr.read()}")
     print(f"\n\nFinished running memcached client on {found_node.metadata.name}")
+
 
 def load_memcached_data(node_name_prefix: str, memcached_ip: str):
     """Load the memcached data on the given node."""
@@ -131,7 +139,7 @@ def load_memcached_data(node_name_prefix: str, memcached_ip: str):
         raise ValueError(f"Node with prefix {node_name_prefix} not found")
 
     command = MCPERF_LOAD_DATA_CMD.format(MEMCACHED_IP=memcached_ip)
-    
+
     process = subprocess.Popen(
         f"gcloud compute ssh --ssh-key-file=~/.ssh/cloud-computing ubuntu@{found_node.metadata.name} --zone {ZONE} --command '{command}'",
         shell=True,
@@ -139,16 +147,19 @@ def load_memcached_data(node_name_prefix: str, memcached_ip: str):
         stderr=subprocess.PIPE,
         text=True,
         bufsize=1,
-        universal_newlines=True
+        universal_newlines=True,
     )
     for line in process.stdout:
-        print(line, end='')
+        print(line, end="")
     process.wait()
     if process.returncode != 0:
-        print(f"Error running script: {process.stderr.read()}")    
+        print(f"Error running script: {process.stderr.read()}")
     print(f"Finished loading memcached data on {found_node.metadata.name}")
 
-def run_memcached_benchmark(node_name_prefix: str, memcached_ip: str, internal_agent_ip: str, log_file: str):
+
+def run_memcached_benchmark(
+    node_name_prefix: str, memcached_ip: str, internal_agent_ip: str, log_file: str
+):
     """Run the memcached benchmark on the given node."""
     # get the node name
     found_node = None
@@ -164,11 +175,9 @@ def run_memcached_benchmark(node_name_prefix: str, memcached_ip: str, internal_a
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
 
     command = MCPERF_BENCHMARK_CMD_TEMPLATE.format(
-        MEMCACHED_IP=memcached_ip,
-        INTERNAL_AGENT_IP=internal_agent_ip
+        MEMCACHED_IP=memcached_ip, INTERNAL_AGENT_IP=internal_agent_ip
     )
 
-    
     # Run the benchmark and capture output
     process = subprocess.Popen(
         f"gcloud compute ssh --ssh-key-file=~/.ssh/cloud-computing ubuntu@{found_node.metadata.name} --zone {ZONE} --command '{command}'",
@@ -177,35 +186,36 @@ def run_memcached_benchmark(node_name_prefix: str, memcached_ip: str, internal_a
         stderr=subprocess.PIPE,
         text=True,
         bufsize=1,
-        universal_newlines=True
+        universal_newlines=True,
     )
-    
+
     # Create output file
     output_file = log_file
-    
+
     # Print output in real-time and save to file
-    with open(output_file, 'w') as f:
+    with open(output_file, "w") as f:
         while True:
             line = process.stdout.readline()
             if not line and process.poll() is not None:
                 break
             if line:
-                print(line, end='')  # Print to console
+                print(line, end="")  # Print to console
                 f.write(line)  # Save to file
                 f.flush()  # Ensure it's written immediately
-    
+
     # Wait for the process to complete
     process.wait()
-    
+
     # Check for errors
     if process.returncode != 0:
         error_output = process.stderr.read()
         print(f"Error running script: {error_output}")
-        with open(output_file, 'a') as f:
+        with open(output_file, "a") as f:
             f.write(f"\nError output:\n{error_output}")
-    
+
     print(f"\n\nFinished running memcached benchmark on {found_node.metadata.name}")
     print(f"Results have been saved to {output_file}")
+
 
 def get_internal_agent_ip():
     """Get the internal agent IP address on the client-agent node."""
@@ -215,26 +225,52 @@ def get_internal_agent_ip():
             return node.status.addresses[0].address
     raise ValueError("Client-agent node not found")
 
+
 def start_interference(interference_pattern: InterferencePattern):
     """Start the interference on the given node."""
     if interference_pattern == InterferencePattern.NONE:
         return
     elif interference_pattern == InterferencePattern.CPU:
-        subprocess.run(["kubectl", "create", "-f", "../interference/ibench-cpu.yaml"], check=True)
+        subprocess.run(
+            ["kubectl", "create", "-f", "../interference/ibench-cpu.yaml"], check=True
+        )
     elif interference_pattern == InterferencePattern.L1D:
-        subprocess.run(["kubectl", "create", "-f", "../interference/ibench-l1d.yaml"], check=True)
+        subprocess.run(
+            ["kubectl", "create", "-f", "../interference/ibench-l1d.yaml"], check=True
+        )
     elif interference_pattern == InterferencePattern.L1I:
-        subprocess.run(["kubectl", "create", "-f", "../interference/ibench-l1i.yaml"], check=True)
+        subprocess.run(
+            ["kubectl", "create", "-f", "../interference/ibench-l1i.yaml"], check=True
+        )
     elif interference_pattern == InterferencePattern.L2:
-        subprocess.run(["kubectl", "create", "-f", "../interference/ibench-l2.yaml"], check=True)
+        subprocess.run(
+            ["kubectl", "create", "-f", "../interference/ibench-l2.yaml"], check=True
+        )
     elif interference_pattern == InterferencePattern.LLC:
-        subprocess.run(["kubectl", "create", "-f", "../interference/ibench-llc.yaml"], check=True)
+        subprocess.run(
+            ["kubectl", "create", "-f", "../interference/ibench-llc.yaml"], check=True
+        )
     elif interference_pattern == InterferencePattern.MEMBW:
-        subprocess.run(["kubectl", "create", "-f", "../interference/ibench-membw.yaml"], check=True)
+        subprocess.run(
+            ["kubectl", "create", "-f", "../interference/ibench-membw.yaml"], check=True
+        )
     print(f"Waiting for pod to start")
     # spin while pod is starting
     while True:
-        pods = subprocess.run(["kubectl", "get", "pods", "-o", "jsonpath={.items[?(@.metadata.name=='ibench-" + interference_pattern.value + "')].status.phase}"], check=True, capture_output=True, text=True)
+        pods = subprocess.run(
+            [
+                "kubectl",
+                "get",
+                "pods",
+                "-o",
+                "jsonpath={.items[?(@.metadata.name=='ibench-"
+                + interference_pattern.value
+                + "')].status.phase}",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
         if pods.stdout == "Running":
             break
         print(f"Pod status: {pods.stdout}")
@@ -242,27 +278,53 @@ def start_interference(interference_pattern: InterferencePattern):
     print(f"Pod started with {interference_pattern} interference")
     time.sleep(10)
     print("Waiting for 10 seconds before starting benchmark")
-    
+
+
 def stop_interference(interference_pattern: InterferencePattern):
     """Stop the interference on the given node."""
     if interference_pattern == InterferencePattern.NONE:
         return
     elif interference_pattern == InterferencePattern.CPU:
-        subprocess.run(["kubectl", "delete", "-f", "../interference/ibench-cpu.yaml"], check=True)
+        subprocess.run(
+            ["kubectl", "delete", "-f", "../interference/ibench-cpu.yaml"], check=True
+        )
     elif interference_pattern == InterferencePattern.L1D:
-        subprocess.run(["kubectl", "delete", "-f", "../interference/ibench-l1d.yaml"], check=True)
+        subprocess.run(
+            ["kubectl", "delete", "-f", "../interference/ibench-l1d.yaml"], check=True
+        )
     elif interference_pattern == InterferencePattern.L1I:
-        subprocess.run(["kubectl", "delete", "-f", "../interference/ibench-l1i.yaml"], check=True)    
+        subprocess.run(
+            ["kubectl", "delete", "-f", "../interference/ibench-l1i.yaml"], check=True
+        )
     elif interference_pattern == InterferencePattern.L2:
-        subprocess.run(["kubectl", "delete", "-f", "../interference/ibench-l2.yaml"], check=True)
+        subprocess.run(
+            ["kubectl", "delete", "-f", "../interference/ibench-l2.yaml"], check=True
+        )
     elif interference_pattern == InterferencePattern.LLC:
-        subprocess.run(["kubectl", "delete", "-f", "../interference/ibench-llc.yaml"], check=True)
+        subprocess.run(
+            ["kubectl", "delete", "-f", "../interference/ibench-llc.yaml"], check=True
+        )
     elif interference_pattern == InterferencePattern.MEMBW:
-        subprocess.run(["kubectl", "delete", "-f", "../interference/ibench-membw.yaml"], check=True)
+        subprocess.run(
+            ["kubectl", "delete", "-f", "../interference/ibench-membw.yaml"], check=True
+        )
     print(f"Waiting for pod to stop")
     # spin while pod is stopping
     while True:
-        pods = subprocess.run(["kubectl", "get", "pods", "-o", "jsonpath={.items[?(@.metadata.name=='ibench-" + interference_pattern.value + "')].status.phase}"], check=True, capture_output=True, text=True)
+        pods = subprocess.run(
+            [
+                "kubectl",
+                "get",
+                "pods",
+                "-o",
+                "jsonpath={.items[?(@.metadata.name=='ibench-"
+                + interference_pattern.value
+                + "')].status.phase}",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
         if pods.stdout == "Terminating":
             print(f"Pod status: {pods.stdout}")
             time.sleep(1)
@@ -272,30 +334,45 @@ def stop_interference(interference_pattern: InterferencePattern):
     print(f"Waiting for 10 seconds before starting next benchmark")
     time.sleep(10)
 
+
 def parse_mode(mode_str: str) -> Mode:
     """Parse the mode string into a Mode enum value."""
     mode_str = mode_str.lower()
-    if mode_str in ['i', 'install', '1']:
+    if mode_str in ["i", "install", "1"]:
         return Mode.INSTALL
-    elif mode_str in ['c', 'client', '2']:
+    elif mode_str in ["c", "client", "2"]:
         return Mode.CLIENT
-    elif mode_str in ['b', 'benchmark', '3']:
+    elif mode_str in ["b", "benchmark", "3"]:
         return Mode.BENCHMARK
     else:
-        raise ValueError(f"Invalid mode: {mode_str}. Must be one of: i/install/1, c/client/2, b/benchmark/3")
+        raise ValueError(
+            f"Invalid mode: {mode_str}. Must be one of: i/install/1, c/client/2, b/benchmark/3"
+        )
+
 
 def main():
     """Main entry point for running Part 1 of the project."""
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Run Part 1 of the Cloud Computing Architecture project')
-    parser.add_argument('mode', type=str, help='Mode of operation: i/install/1, c/client/2, b/benchmark/3')
-    parser.add_argument('--memcached-ip', type=str, help='IP address of memcached server', default='100.96.3.2')
+    parser = argparse.ArgumentParser(
+        description="Run Part 1 of the Cloud Computing Architecture project"
+    )
+    parser.add_argument(
+        "mode",
+        type=str,
+        help="Mode of operation: i/install/1, c/client/2, b/benchmark/3",
+    )
+    parser.add_argument(
+        "--memcached-ip",
+        type=str,
+        help="IP address of memcached server",
+        default="100.96.3.2",
+    )
     args = parser.parse_args()
 
     try:
         mode = parse_mode(args.mode)
-        memcached_ip = "100.96.3.2"  # Hardcoded for now
-          
+        memcached_ip = "100.96.2.4"  # Hardcoded for now
+
         internal_agent_ip = get_internal_agent_ip()
 
         if mode == Mode.INSTALL:
@@ -314,14 +391,22 @@ def main():
             for interference_pattern in InterferencePattern:
                 start_interference(interference_pattern)
                 for i in range(0, 3):
-                    run_memcached_benchmark("client-measure", memcached_ip, internal_agent_ip, f"logs/benchmark_results_{interference_pattern.value}_{i}.txt")
+                    run_memcached_benchmark(
+                        "client-measure",
+                        memcached_ip,
+                        internal_agent_ip,
+                        f"logs/benchmark_results_{interference_pattern.value}_{i}.txt",
+                    )
                     print("waiting 60 seconds before next benchmark")
                     time.sleep(60)
                 stop_interference(interference_pattern)
-            print(f"\nFinished memcached benchmark with {interference_pattern.value} interference\n\n")
-      
+            print(
+                f"\nFinished memcached benchmark with {interference_pattern.value} interference\n\n"
+            )
+
     except Exception as e:
         print(f"Error: {str(e)}")
+
 
 if __name__ == "__main__":
     # Run the main function
