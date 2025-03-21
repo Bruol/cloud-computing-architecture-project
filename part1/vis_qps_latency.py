@@ -4,18 +4,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-"""
-This script creates a visualization showing P95 latency vs QPS across different
-interference configurations for memcached benchmarks. It processes multiple benchmark
-files, averages across runs, and produces a clean, publication-quality plot.
-"""
-
 # Define the configuration types we're analyzing
 config_types = ["none", "cpu", "l1d", "l1i", "l2", "llc", "membw"]
 num_runs = 3  # Number of runs per configuration
 log_dir = "./logs"  # Directory containing the benchmark logs
 
-# Visual styling elements
+# Visual styling elements - Distinct colors and markers for each configuration
 colors = [
     "blue",
     "red",
@@ -24,8 +18,8 @@ colors = [
     "purple",
     "brown",
     "black",
-]  # Distinct colors for each config
-markers = ["o", "s", "^", "D", "*", "x", "+"]  # Distinct markers for each config
+]
+markers = ["o", "s", "^", "D", "*", "x", "+"]
 
 
 def parse_benchmark_file(file_path):
@@ -45,18 +39,14 @@ def parse_benchmark_file(file_path):
     try:
         with open(file_path, "r") as f:
             lines = f.readlines()
-            # Skip the header line containing column names
             for line in lines[1:]:
-                if line.startswith("read"):  # Lines with actual data start with 'read'
+                if line.startswith("read"):
                     parts = line.split()
-                    if len(parts) >= 17:  # Ensure we have all expected columns
-                        # Extract the specific metrics we need for this plot
+                    if len(parts) >= 17:
                         row = {
-                            # Average latency (not used in this plot but useful for reference)
-                            "avg": float(parts[1]) / 1000.0,  # Convert μs to ms
                             # 95th percentile latency - our key metric of interest
                             "p95": float(parts[12]) / 1000.0,  # Convert μs to ms
-                            # Actual QPS achieved (not the target QPS)
+                            # Actual QPS achieved
                             "actual_qps": float(parts[16]),
                             # Target QPS that was requested
                             "target_qps": float(parts[17]),
@@ -68,13 +58,10 @@ def parse_benchmark_file(file_path):
                             ),
                         }
                         data.append(row)
-
-                # Stop processing at warning lines (end of useful data)
                 if line.startswith("Warning"):
                     break
     except Exception as e:
         print(f"Error processing {file_path}: {e}")
-
     return data
 
 
@@ -83,7 +70,6 @@ def parse_benchmark_file(file_path):
 print("Phase 1: Collecting benchmark data...")
 all_data = []  # Will hold all parsed data points
 
-# Iterate through each configuration and run
 for config in config_types:
     for i in range(num_runs):
         file_pattern = f"{log_dir}/benchmark_results_{config}_{i}.txt"
@@ -93,8 +79,6 @@ for config in config_types:
             all_data.extend(data)
         else:
             print(f"Warning: {file_pattern} not found")
-
-# Check if we found any data
 if not all_data:
     print("No data found. Check your log directory and file patterns.")
     exit(1)
@@ -103,7 +87,6 @@ if not all_data:
 # ------------------------
 print("Phase 2: Processing data...")
 
-# Convert collected data to a pandas DataFrame for easier manipulation
 df = pd.DataFrame(all_data)
 
 # Group by configuration and target QPS to calculate statistics across runs
@@ -112,8 +95,8 @@ avg_df = (
     df.groupby(["config", "target_qps"])
     .agg(
         {
-            "actual_qps": ["mean", "std"],  # Mean and std dev of achieved QPS
-            "p95": ["mean", "std"],  # Mean and std dev of P95 latency
+            "actual_qps": ["mean", "std"],
+            "p95": ["mean", "std"],
         }
     )
     .reset_index()
@@ -126,30 +109,31 @@ avg_df.columns = ["_".join(col).strip("_") for col in avg_df.columns.values]
 # ---------------------
 print("Phase 3: Creating visualization...")
 
-# Create a new figure with appropriate size for publication
+# Create a new figure with appropriate size for report
 plt.figure(figsize=(10, 6))
 
 # Plot each configuration as a separate line
 for i, config in enumerate(config_types):
-    # Extract data for this configuration
     config_data = avg_df[avg_df["config"] == config].sort_values("actual_qps_mean")
-
     if not config_data.empty:
-        # Plot line with error bars
-        plt.plot(
+        # Plot line with error bars in both x and y dimensions
+        plt.errorbar(
             config_data["actual_qps_mean"],  # X-axis: mean achieved QPS
             config_data["p95_mean"],  # Y-axis: mean P95 latency
-            f"{markers[i]}-",  # Line style with marker
+            yerr=config_data["p95_std"],  # Y error bars: std dev of P95 latency
+            xerr=config_data["actual_qps_std"],  # X error bars: std dev of QPS
+            fmt=f"{markers[i]}-",  # Line style with marker
             color=colors[i],  # Line color
             label=config.upper(),  # Legend label
             linewidth=2,  # Thicker line for visibility
             markersize=8,  # Larger markers for clarity
+            capsize=5,  # Add caps to the error bars
         )
 
-# Set axis limits and labels
 plt.xlim(0, 80000)  # X-axis from 0 to 80K QPS as specified
 plt.xlabel("Actual Queries Per Second (QPS)", fontsize=14)
-plt.ylabel("95th Percentile Latency (ms)", fontsize=14)  # Changed from μs to ms
+plt.ylim(0, 6)  # Y-axis from 0 to 6 ms for P95 latency
+plt.ylabel("95th Percentile Latency (ms)", fontsize=14)
 plt.title(
     "Memcached P95 Latency vs QPS Under Different Interference Types", fontsize=16
 )
@@ -160,7 +144,6 @@ plt.grid(True, linestyle="--", alpha=0.7)
 # Add legend to identify configurations
 plt.legend(fontsize=12, loc="best")
 
-# Add explanatory note about data averaging
 plt.figtext(
     0.5,
     0.01,
@@ -169,22 +152,7 @@ plt.figtext(
     fontsize=10,
 )
 
-# Ensure tight layout for best appearance
-plt.tight_layout(pad=2.0)
-
 # Save the visualization to a file
 output_file = "memcached_p95_qps_plot.png"
-plt.savefig(output_file, dpi=300, bbox_inches="tight")
-
-# Create a version with log-scale y-axis for better visualization of the hockey-stick effect
-# plt.yscale('log')
-plt.ylabel(
-    "95th Percentile Latency (ms, log scale)", fontsize=14
-)  # Changed from μs to ms
-plt.title("Memcached P95 Latency vs QPS (Log Scale)", fontsize=16)
-plt.savefig("memcached_p95_qps_plot_log.png", dpi=300, bbox_inches="tight")
-
-print(
-    f"Plots saved as 'memcached_p95_qps_plot.png' and 'memcached_p95_qps_plot_log.png'"
-)
-plt.show()
+plt.savefig(output_file, dpi=500, bbox_inches="tight")
+print(f"Visualization saved to {output_file}")
