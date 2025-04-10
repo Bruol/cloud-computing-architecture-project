@@ -13,15 +13,13 @@ spec:
         imagePullPolicy: Always
         command: ["/bin/sh"]
         args: ["-c", "taskset -c 1 ./run -a run -S parsec -p blackscholes -i native -n 1"]
-        # Whether to use resource requests and limits
-        # depends on the node type
-        #resources:
-        #  requests:
-        #    memory: "512Mi"
-        #    cpu: "900m"  # Nearly 1 full core
-        #  limits:
-        #    memory: "1Gi"
-        #    cpu: "1"     # 1 full core
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "800m"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
       restartPolicy: Never
       nodeSelector:
         cca-project-nodetype: "node-b-2core"

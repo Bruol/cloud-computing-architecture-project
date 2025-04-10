@@ -11,15 +11,13 @@ spec:
       imagePullPolicy: Always
       command: ["/bin/sh"]
       args: ["-c", "taskset -c 0 ./memcached -t 1 -u memcache"]
-      # Whether to use resource requests and limits
-      # depends on the node type
-      #resources:
-      #  requests:
-      #    memory: "512Mi"
-      #    cpu: "900m"  # Nearly 1 full core
-      #  limits:
-      #    memory: "1Gi"
-      #    cpu: "1"     # 1 full core
+      resources:
+        requests:
+          memory: "1.2Gi"
+          cpu: "1"
+        limits:
+          memory: "1.2Gi"
+          cpu: "1"
   nodeSelector:
     cca-project-nodetype: "node-b-2core"
 
