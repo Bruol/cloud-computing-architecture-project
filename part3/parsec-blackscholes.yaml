@@ -15,10 +15,10 @@ spec:
         args: ["-c", "taskset -c 1 ./run -a run -S parsec -p blackscholes -i native -n 1"]
         resources:
           requests:
-            memory: "512Mi"
+            memory: "256Mi"
             cpu: "800m"
           limits:
-            memory: "512Mi"
+            memory: "256Mi"
             cpu: "1"
       restartPolicy: Never
       nodeSelector:
