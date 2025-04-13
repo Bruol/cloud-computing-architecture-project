@@ -1,31 +1,35 @@
 #!/bin/bash
 
-echo "Starting controller for node-b-2core (blackscholes)..."
+echo "Starting controller for node-b-2core (blackscholes, dedup, vips)..."
 
-# Function to run blackscholes with restart handling
-run_blackscholes() {
+# Function to run a job with restart handling
+run_job() {
+  local job_name=$1
+  local yaml_file=$2
   local max_attempts=3
   local attempt=1
 
   while [ $attempt -le $max_attempts ]; do
-    echo "Starting blackscholes (attempt $attempt)..."
-    kubectl apply -f part3/parsec-blackscholes.yaml
+    echo "Starting $job_name (attempt $attempt)..."
+    kubectl apply -f $yaml_file
 
     # Check if job completes successfully
-    if kubectl wait --for=condition=complete job/parsec-blackscholes --timeout=2h; then
-      echo "Blackscholes completed successfully."
+    if kubectl wait --for=condition=complete job/$job_name --timeout=2h; then
+      echo "$job_name completed successfully."
       return 0
     else
-      echo "Blackscholes failed on attempt $attempt."
-      kubectl delete job parsec-blackscholes --ignore-not-found
+      echo "$job_name failed on attempt $attempt."
+      kubectl delete job $job_name --ignore-not-found
       attempt=$((attempt + 1))
       sleep 10
     fi
   done
 
-  echo "Failed to run blackscholes after $max_attempts attempts."
+  echo "Failed to run $job_name after $max_attempts attempts."
   return 1
 }
 
-# Run blackscholes with restart handling
-run_blackscholes
+# Run jobs sequentially with restart handling
+run_job parsec-blackscholes part3/parsec-blackscholes.yaml
+run_job parsec-dedup part3/parsec-dedup.yaml
+run_job parsec-vips part3/parsec-vips.yaml

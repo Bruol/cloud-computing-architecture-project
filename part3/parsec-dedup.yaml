@@ -11,8 +11,8 @@ spec:
       - image: anakli/cca:parsec_dedup
         name: parsec-dedup
         imagePullPolicy: Always
-        command: ["/bin/sh"]
-        args: ["-c", "./run -a run -S parsec -p dedup -i native -n 4"]
+        command: [ "/bin/sh" ]
+        args: [ "-c", "./run -a run -S parsec -p dedup -i native -n 2" ]
       restartPolicy: Never
       nodeSelector:
-        cca-project-nodetype: "node-d-4core"
+        cca-project-nodetype: "node-b-2core"

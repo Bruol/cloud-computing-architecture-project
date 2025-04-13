@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Starting controller for node-d-4core (ferret, vips, dedup)..."
+echo "Starting controller for node-d-4core (ferret with memcached)..."
 
 # Function to run a job with restart handling
 run_job() {
@@ -29,7 +29,5 @@ run_job() {
   return 1
 }
 
-# Run jobs sequentially with restart handling
+# Run only ferret on node-d (memcached is already running)
 run_job parsec-ferret part3/parsec-ferret.yaml
-run_job parsec-vips part3/parsec-vips.yaml
-run_job parsec-dedup part3/parsec-dedup.yaml

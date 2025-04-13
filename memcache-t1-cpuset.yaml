@@ -6,19 +6,17 @@ metadata:
     name: memcached
 spec:
   containers:
-    - image: anakli/memcached:t1
-      name: memcached
-      imagePullPolicy: Always
-      command: ["/bin/sh"]
-      args: ["-c", "taskset -c 0 ./memcached -t 1 -u memcache"]
-      resources:
-        requests:
-          memory: "1024Mi"
-          cpu: "1"
-        limits:
-          memory: "1024Mi"
-          cpu: "1"
+  - image: anakli/memcached:t1
+    name: memcached
+    imagePullPolicy: Always
+    command: [ "/bin/sh" ]
+    args: [ "-c", "taskset -c 0-1 ./memcached -t 2 -u memcache" ]
+    resources:
+      requests:
+        memory: "8192Mi"
+        cpu: "2"
+      limits:
+        memory: "8192Mi"
+        cpu: "2"
   nodeSelector:
-    cca-project-nodetype: "node-b-2core"
-
-
+    cca-project-nodetype: "node-d-4core"
