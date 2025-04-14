@@ -82,15 +82,17 @@ Further the script will wait 60s between each run to ensure a particular run is 
 ## Run Part 2
 
 1. Follow the instructions in the handout and setup the cluster.
-
 2. Keep in mind to change the node type from `memcached` to `parsec` in interference benchmark.
-
 3. Generate the logs for test purposes: `python part2/gen_logs_interference.py --test --workload=canneal --interference=cpu --repetitions=1`
-
 4. Generate all logs: `python part2/gen_logs_interference.py`
+5. Visualise the results: `python part2/vis_logs_interference.py part2/parsec_results/all_results.csv --output-dir=part2/visualizations`
 
-4. Visualise the results: `python part2/vis_logs_interference.py part2/parsec_results/all_results.csv --output-dir=part2/visualizations`
+## Run Part 3
 
+1. Follow the instructions in the handout and setup the cluster.
+2. Install mcperf-dynamic: `./part3/install_mcperf`.sh
+3. Run `./part3_experiment.sh`
+4. Visualise the results: `python3 part3/analyze_results.py`
 
 ## Other Information
 
