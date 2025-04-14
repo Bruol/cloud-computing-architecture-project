@@ -3,9 +3,18 @@
 # Exit on errors, but allow us to clean up first
 set -e
 
+# Check for run number argument
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <run_number>"
+    echo "Example: $0 2   # Run experiment #2"
+    exit 1
+fi
+
+run_number=$1
+
 # Constants
 RESULTS_DIR="part_3_results_group_020"
-LOG_FILE="experiment_log.txt"
+LOG_FILE="experiment_${run_number}_log.txt"
 SSH_KEY_FILE="$HOME/.ssh/cloud-computing"
 ZONE="europe-west1-b"
 
@@ -14,7 +23,7 @@ mkdir -p $RESULTS_DIR
 
 # Start logging
 exec > >(tee -a $LOG_FILE) 2>&1
-echo "=== Starting experiment run at $(date) ==="
+echo "=== Starting experiment run #${run_number} at $(date) ==="
 
 # Function to check if mcperf is installed on a node
 check_mcperf_installed() {
@@ -97,7 +106,7 @@ run_experiment() {
     echo "=========================================="
 
     # 1. Deploy memcached
-    echo "Starting memcached on node-b-2core..."
+    echo "Starting memcached on node-d-4core..."
     kubectl apply -f memcache-t1-cpuset.yaml
 
     echo "Waiting for memcached to be ready..."
@@ -218,7 +227,7 @@ run_experiment() {
 }
 
 # Main execution
-echo "Starting experiment with 3 runs"
+echo "Starting experiment run #${run_number}"
 
 # Verify installations
 verify_installations || {
@@ -237,38 +246,37 @@ if [ ! -x "./part3/controller-main.sh" ]; then
     chmod +x ./part3/controller-main.sh
 fi
 
-# Run all three experiments
-for run in 1 2 3; do
-    run_experiment $run || {
-        echo "ERROR: Run #$run failed. Attempting to continue with next run."
-    }
-done
+# Run single experiment
+run_experiment $run_number || {
+    echo "ERROR: Run #$run_number failed."
+    exit 1
+}
 
-echo "All experiments completed!"
+echo "Experiment run #${run_number} completed!"
 echo "Results are stored in the $RESULTS_DIR directory."
 
 # Verify all required files exist
 echo "Verifying results..."
 exit_code=0
-for run in 1 2 3; do
-    if [ ! -f "$RESULTS_DIR/pods_${run}.json" ]; then
-        echo "WARNING: pods_${run}.json is missing"
-        exit_code=1
-    fi
+if [ ! -f "$RESULTS_DIR/pods_${run_number}.json" ]; then
+    echo "WARNING: pods_${run_number}.json is missing"
+    exit_code=1
+fi
 
-    if [ ! -f "$RESULTS_DIR/mcperf_${run}.txt" ]; then
-        echo "WARNING: mcperf_${run}.txt is missing"
-        exit_code=1
-    fi
-done
+if [ ! -f "$RESULTS_DIR/mcperf_${run_number}.txt" ]; then
+    echo "WARNING: mcperf_${run_number}.txt is missing"
+    exit_code=1
+fi
 
 if [ $exit_code -eq 0 ]; then
-    echo "All required files are present."
-    echo "You can now analyze the results with:"
-    echo "python3 analyze_results.py"
+    echo "All required files for run #${run_number} are present."
+    echo ""
+    echo "To run the next experiment:"
+    echo "  ./part3_experiment.sh $((run_number + 1))"
+    echo ""
 else
     echo "Some files are missing. Please check the logs."
 fi
 
-echo "=== Experiment completed at $(date) ==="
+echo "=== Experiment #${run_number} completed at $(date) ==="
 exit $exit_code
