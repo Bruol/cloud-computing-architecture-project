@@ -644,3 +644,7 @@ job.batch "parsec-ferret" deleted
 pod "memcached" deleted
 Starting parsec-ferret (attempt 3)...
 job.batch/parsec-ferret created
+error: timed out waiting for the condition on jobs/parsec-ferret
+parsec-ferret failed on attempt 3.
+Unable to connect to the server: read tcp 127.0.0.1:52913->127.0.0.1:10011: read: connection reset by peer
+Failed to run parsec-ferret after 3 attempts.

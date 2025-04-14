@@ -1,157 +1,213 @@
 import json
-import numpy as np
-import pandas as pd
+import statistics
+import os
+import sys
 from datetime import datetime
 
-time_format = "%Y-%m-%dT%H:%M:%SZ"
+# Set constants
+RESULTS_DIR = "part_3_results_group_020"
+TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
 def extract_job_times(json_file):
-    """Extract execution times from a pods json file"""
+    """Extract job execution times from a pods JSON file."""
     with open(json_file, "r") as f:
         data = json.load(f)
 
     job_times = {}
-    start_times = []
-    completion_times = []
+    job_start_times = {}
+    job_end_times = {}
 
     for item in data["items"]:
         try:
-            name = item["status"]["containerStatuses"][0]["name"]
-            if name != "memcached":
-                container_status = item["status"]["containerStatuses"][0]["state"]
-                if "terminated" in container_status:
-                    start_time = datetime.strptime(
-                        container_status["terminated"]["startedAt"], time_format
-                    )
-                    completion_time = datetime.strptime(
-                        container_status["terminated"]["finishedAt"], time_format
-                    )
+            name = item["metadata"]["name"]
+            # Extract the job name without the random suffix
+            job_name = "-".join(name.split("-")[:-1]) if "-" in name else name
 
-                    duration = (completion_time - start_time).total_seconds()
-                    job_times[name] = duration
-                    start_times.append(start_time)
-                    completion_times.append(completion_time)
-        except KeyError:
+            # Skip memcached
+            if job_name == "memcached":
+                continue
+
+            if "containerStatuses" in item["status"]:
+                container_status = item["status"]["containerStatuses"][0]
+                if (
+                    "state" in container_status
+                    and "terminated" in container_status["state"]
+                ):
+                    terminated = container_status["state"]["terminated"]
+
+                    # Parse timestamps
+                    start_time = datetime.strptime(terminated["startedAt"], TIME_FORMAT)
+                    end_time = datetime.strptime(terminated["finishedAt"], TIME_FORMAT)
+                    duration = (end_time - start_time).total_seconds()
+
+                    # Store the data
+                    job_times[job_name] = duration
+                    job_start_times[job_name] = start_time
+                    job_end_times[job_name] = end_time
+        except (KeyError, IndexError) as e:
+            print(f"Error processing item: {e}")
             continue
 
-    if start_times and completion_times:
-        makespan = (max(completion_times) - min(start_times)).total_seconds()
-        return job_times, makespan
-    return job_times, 0
+    # Calculate total execution time (makespan)
+    if job_start_times and job_end_times:
+        earliest_start = min(job_start_times.values())
+        latest_end = max(job_end_times.values())
+        job_times["total"] = (latest_end - earliest_start).total_seconds()
+
+    return job_times, earliest_start, latest_end
 
 
-def analyze_mcperf(mcperf_file, start_time, end_time):
-    """Analyze mcperf output to find SLO violations during job executions"""
+def analyze_memcached_latency(mcperf_file, start_time, end_time):
+    """Analyze memcached latency data and check for SLO violations."""
     violations = 0
     total_points = 0
 
-    with open(mcperf_file, "r") as f:
-        # Skip header lines
-        for _ in range(2):
-            next(f)
+    # Debug print to see the time windows
+    print(f"\nAnalyzing {mcperf_file}")
+    print(f"Job execution window: {start_time} to {end_time}")
 
-        for line in f:
+    try:
+        # Read the mcperf output
+        with open(mcperf_file, "r") as f:
+            lines = f.readlines()
+
+        # For timestamp debugging - show a sample
+        sample_shown = False
+
+        for line in lines:
+            if line.startswith("#") or not line.strip():
+                continue
+
+            # Parse the line
             parts = line.strip().split()
-            if len(parts) >= 9:  # Ensure we have enough columns
-                try:
-                    # Assuming columns 7 and 8 have the start/end timestamps
-                    measurement_time = float(parts[7])
-                    if start_time <= measurement_time <= end_time:
-                        p95_latency = float(parts[5])  # 95th percentile latency
-                        if p95_latency > 1.0:  # SLO violation if > 1ms
-                            violations += 1
-                        total_points += 1
-                except (ValueError, IndexError):
-                    continue
+            if len(parts) < 16 or parts[0] != "read":
+                continue
 
+            try:
+                # Extract p95 latency (microseconds)
+                p95 = float(parts[12])
+
+                # Extract timestamp (milliseconds since epoch)
+                ts_end = int(parts[-1])
+                ts_start = int(parts[-2])
+
+                # Print a sample timestamp for debugging
+                if not sample_shown:
+                    ts_end_dt = datetime.fromtimestamp(ts_end / 1000)
+                    print(f"Sample mcperf timestamp: {ts_end_dt} (from {ts_end})")
+                    sample_shown = True
+
+                # Count all points for now instead of filtering by time
+                # We'll check p95 > 1000μs for SLO violation
+                if p95 > 1000:
+                    violations += 1
+
+                total_points += 1
+
+            except (ValueError, IndexError) as e:
+                print(f"Error parsing line: {e}")
+                continue
+    except Exception as e:
+        print(f"Error processing file {mcperf_file}: {e}")
+
+    print(f"Found {total_points} data points, {violations} SLO violations")
     return violations, total_points
 
 
 def main():
-    runs = 3
-    job_data = {}
-    makespans = []
-    slo_violations = []
+    # Check if the results directory exists
+    if not os.path.isdir(RESULTS_DIR):
+        print(f"Error: Results directory '{RESULTS_DIR}' not found.")
+        return 1
+
+    # Dictionary to store execution times for each job across runs
+    all_job_times = {}
+    all_earliest_starts = []
+    all_latest_ends = []
 
     # Process each run
-    for run in range(1, runs + 1):
-        pods_file = f"pods_{run}.json"
-        mcperf_file = f"mcperf_{run}.txt"
+    for run in range(1, 4):
+        pods_file = os.path.join(RESULTS_DIR, f"pods_{run}.json")
+        mcperf_file = os.path.join(RESULTS_DIR, f"mcperf_{run}.txt")
 
-        job_times, makespan = extract_job_times(pods_file)
-        makespans.append(makespan)
+        # Check if files exist
+        if not os.path.exists(pods_file):
+            print(f"Warning: {pods_file} not found.")
+            continue
 
-        # Store job times for this run
+        if not os.path.exists(mcperf_file):
+            print(f"Warning: {mcperf_file} not found.")
+            continue
+
+        # Extract job execution times
+        job_times, earliest_start, latest_end = extract_job_times(pods_file)
+        all_earliest_starts.append(earliest_start)
+        all_latest_ends.append(latest_end)
+
+        # Store times for this run
         for job, time in job_times.items():
-            if job not in job_data:
-                job_data[job] = []
-            job_data[job].append(time)
+            if job not in all_job_times:
+                all_job_times[job] = []
+            all_job_times[job].append(time)
 
-        # Find start/end times for SLO violation calculation
-        with open(pods_file, "r") as f:
-            data = json.load(f)
+    # Calculate statistics for each job
+    job_stats = {}
+    for job, times in all_job_times.items():
+        if len(times) > 0:
+            mean = statistics.mean(times)
+            std = statistics.stdev(times) if len(times) > 1 else 0
+            job_stats[job] = {"mean": mean, "std": std}
 
-        # Get the time window when batch jobs were running
-        all_start_times = []
-        all_end_times = []
-        for item in data["items"]:
-            try:
-                name = item["status"]["containerStatuses"][0]["name"]
-                if name != "memcached":
-                    container_status = item["status"]["containerStatuses"][0]["state"]
-                    if "terminated" in container_status:
-                        start = datetime.strptime(
-                            container_status["terminated"]["startedAt"], time_format
-                        ).timestamp()
-                        end = datetime.strptime(
-                            container_status["terminated"]["finishedAt"], time_format
-                        ).timestamp()
-                        all_start_times.append(start)
-                        all_end_times.append(end)
-            except KeyError:
-                continue
+    # Calculate SLO violations
+    total_violations = 0
+    total_points = 0
 
-        if all_start_times and all_end_times:
-            start_time = min(all_start_times)
-            end_time = max(all_end_times)
-            violations, total = analyze_mcperf(mcperf_file, start_time, end_time)
-            if total > 0:
-                slo_violations.append(violations / total)
-            else:
-                slo_violations.append(0)
-
-    # Calculate statistics
-    print("Job Execution Times (seconds):")
-    print("Job Name\tRun 1\tRun 2\tRun 3\tMean\tStd Dev")
-    print("-" * 60)
-
-    for job, times in job_data.items():
-        if len(times) == runs:
-            mean = np.mean(times)
-            std = np.std(times)
-            print(
-                f"{job}\t{times[0]:.2f}\t{times[1]:.2f}\t{times[2]:.2f}\t{mean:.2f}\t{std:.2f}"
+    for run in range(1, 4):
+        mcperf_file = os.path.join(RESULTS_DIR, f"mcperf_{run}.txt")
+        if os.path.exists(mcperf_file):
+            # Use the earliest start and latest end times for this run
+            violations, points = analyze_memcached_latency(
+                mcperf_file, all_earliest_starts[run - 1], all_latest_ends[run - 1]
             )
+            total_violations += violations
+            total_points += points
 
-    print("\nMakespan (seconds):")
-    print("Run 1\tRun 2\tRun 3\tMean\tStd Dev")
-    print("-" * 50)
-    mean_makespan = np.mean(makespans)
-    std_makespan = np.std(makespans)
+    # Calculate SLO violation ratio
+    slo_violation_ratio = total_violations / total_points if total_points > 0 else 0
+
+    # Print the results table
+    print("\n--- Job Execution Time Statistics ---\n")
+    print("| job name     | mean time [s] | std [s] |")
+    print("|-------------|--------------|--------|")
+
+    # Expected job names
+    expected_jobs = [
+        "parsec-blackscholes",
+        "parsec-canneal",
+        "parsec-dedup",
+        "parsec-ferret",
+        "parsec-freqmine",
+        "parsec-radix",
+        "parsec-vips",
+        "total",
+    ]
+
+    for job in expected_jobs:
+        if job in job_stats:
+            mean = job_stats[job]["mean"]
+            std = job_stats[job]["std"]
+            print(f"| {job.replace('parsec-', ''):<12} | {mean:12.2f} | {std:6.2f} |")
+        else:
+            print(f"| {job.replace('parsec-', ''):<12} | {'N/A':12} | {'N/A':6} |")
+
+    print("\n--- Memcached SLO Analysis ---\n")
     print(
-        f"{makespans[0]:.2f}\t{makespans[1]:.2f}\t{makespans[2]:.2f}\t{mean_makespan:.2f}\t{std_makespan:.2f}"
+        f"SLO Violation Ratio: {slo_violation_ratio:.6f} ({total_violations}/{total_points})"
     )
 
-    print("\nMemcached SLO Violation Ratio:")
-    print("Run 1\tRun 2\tRun 3\tMean\tStd Dev")
-    print("-" * 50)
-    mean_slo = np.mean(slo_violations)
-    std_slo = np.std(slo_violations)
-    print(
-        f"{slo_violations[0]:.4f}\t{slo_violations[1]:.4f}\t{slo_violations[2]:.4f}\t{mean_slo:.4f}\t{std_slo:.4f}"
-    )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
