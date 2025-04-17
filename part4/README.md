@@ -52,3 +52,10 @@ cd memcache-perf-dynamic
 ```bash
 kops delete cluster --name part4.k8s.local --yes
 ```
+
+# Part 4.1
+
+- experiment 1: 1 core, 1 thread
+- experiment 2: 2 cores, 1 threads
+- experiment 3: 1 cores, 2 threads
+- experiment 4: 2 cores, 2 threads

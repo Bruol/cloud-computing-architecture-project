@@ -15,7 +15,7 @@ experiments = {
         "Threads": 1
     },
     "3": {
-        "Cores": "0,1",
+        "Cores": "0",
         "Threads": 2
     },
     "4": {
@@ -32,18 +32,47 @@ def run_load(path: str):
     with open("ansible/inventory.yaml", "r") as f:
         inventory = yaml.safe_load(f)
         client_measure_external_ip = inventory["all"]["children"]["client_measures"]["hosts"]["client-measure"]["ansible_host"]
-        
+
         with open(path, "w") as f:
             # run the load and save the output to the path
             subprocess.run([
-                "ssh",
+            "ssh",
             "-i", "~/.ssh/cloud-computing",
             f"ubuntu@{client_measure_external_ip}",
             "cd memcache-perf-dynamic && ./run_load.sh"
             ], check=True,
             stdout=f,
             stderr=f
-        )
+            )
+
+
+
+        # memcached_internal_ip = inventory["all"]["children"]["memcached_servers"]["hosts"]["memcache-server"]["ansible_host"]
+        # client_agent_internal_ip = inventory["all"]["children"]["client_agents"]["hosts"]["client-agent"]["internal_ip"]
+
+        # print(f"load data into memcached")
+        # subprocess.run([
+        #     "ssh",
+        #     "-i", "~/.ssh/cloud-computing",
+        #     f"ubuntu@{client_measure_external_ip}",
+        #     "cd memcache-perf-dynamic && ./mcperf -s 10.0.16.6 --loadonly"
+        # ], check=True)
+
+        # time.sleep(10)
+
+        # print(f"running load")
+
+        # with open(path, "w") as f:
+        #     # run the load and save the output to the path
+        #     subprocess.run([
+        #         "ssh",
+        #     "-i", "~/.ssh/cloud-computing",
+        #     f"ubuntu@{client_measure_external_ip}",
+        #     f"cd memcache-perf-dynamic && ./mcperf -s {memcached_internal_ip} -a {client_agent_internal_ip} --noload -T 8 -C 8 -D 4 -Q 1000 -c 8 -t 5 --scan 5000:220000:5000"
+        #     ], check=True,
+        #     stdout=f,
+        #     stderr=f
+        # )
 
        
 
@@ -90,6 +119,25 @@ def run_experiment(experiment: str, run: int = 1, output_dir: str = "output"):
         # run the load 
         run_load(f"{output_dir}/experiment{experiment}_run{run}.txt")
         print(f"load finished")
+
+        print(f"stopping memcached")
+        # stop memcached
+        subprocess.run([
+            "ssh",
+            "-i", "~/.ssh/cloud-computing",
+            f"ubuntu@{memcached_external_ip}",
+            "sudo systemctl stop memcached"
+        ], check=True)
+
+        print(f"killing any remaining memcached processes")
+        # kill any remaining memcached processes
+        subprocess.run([
+            "ssh",
+            "-i", "~/.ssh/cloud-computing",
+            f"ubuntu@{memcached_external_ip}",
+            "sudo pkill -f memcached"
+        ], check=True)
+        time.sleep(5)
 
 
 
