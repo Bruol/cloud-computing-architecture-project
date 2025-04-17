@@ -7,10 +7,10 @@ from collections import defaultdict
 def main():
     # Define the configurations
     configs = {
-        "experiment1": {"T": 1, "C": 1, "label": "T=1, C=1"},
-        "experiment2": {"T": 1, "C": 2, "label": "T=1, C=2"},
-        "experiment3": {"T": 2, "C": 1, "label": "T=2, C=1"},
-        "experiment4": {"T": 2, "C": 2, "label": "T=2, C=2"}
+        "experiment1": {"T": 1, "C": 1, "label": "Threads = 1, Cores = 1"},
+        "experiment2": {"T": 1, "C": 2, "label": "Threads = 1, Cores = 2"},
+        "experiment3": {"T": 2, "C": 1, "label": "Threads = 2, Cores = 1"},
+        "experiment4": {"T": 2, "C": 2, "label": "Threads = 2, Cores = 2"}
     }
     
     # Create a figure with increased width
@@ -19,6 +19,7 @@ def main():
     # Colors for each configuration
     colors = ['blue', 'red', 'green', 'purple']
     
+
     # Process each configuration
     for i, (exp_name, config) in enumerate(configs.items()):
         # Dictionary to store data points for each target QPS
@@ -27,7 +28,7 @@ def main():
         
         # Process each run
         for run in range(3):
-            log_file = os.path.join(os.path.dirname(__file__), "output", f"{exp_name}_run{run}.txt")
+            log_file = os.path.join(os.path.dirname(__file__), f"logs_run1", f"{exp_name}_run{run}.txt")
             mcperf_log = mcPerfLogs.McPerfLogs(log_file)
             data = mcperf_log.parse_log_file()
             
@@ -42,7 +43,7 @@ def main():
                 
                 qps_data[target].append(qps)
                 latency_data[target].append(p95_latency)
-        
+            
         # Calculate average QPS and latency for each target QPS
         avg_qps = []
         avg_latency = []
@@ -65,7 +66,7 @@ def main():
     plt.title('Memcached Performance: 95th Percentile Latency vs. Achieved QPS', fontsize=14)
     
     # Set y-axis to log scale
-    plt.yscale('log')
+    # plt.yscale('log')
     
     # Add grid with appropriate alpha for log scale
     plt.grid(True, linestyle='--', alpha=0.4, which='both')
