@@ -36,6 +36,9 @@ kubectl get nodes -o wide
 ansible-playbook -i inventory.yml playbook.yml
 ```
 
+> [!NOTE]
+> If you get an error asking about a fingerprint type yes.
+
 ## start the load
 
 ```bash

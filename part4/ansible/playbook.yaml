@@ -27,8 +27,10 @@
         line: "{{ item.line }}"
       loop:
         - { regexp: '^-m \d+', line: "-m 1024" }
-        - { regexp: '^-l \S+', line: "-l {{ internal_ip }}" }
+        - { regexp: "^-l.*", line: "-l {{ internal_ip }}" }
         - { regexp: '^-t \d+', line: "-t {{ memcached_threads | default(1) }}" }
+      notify:
+        - Restart memcached
 
   handlers:
     - name: Restart memcached
@@ -41,11 +43,10 @@
   become: true
   tasks:
     - name: Update sources.list to include deb-src
-      ansible.builtin.lineinfile:
+      ansible.builtin.replace:
         path: /etc/apt/sources.list.d/ubuntu.sources
         regexp: "^Types: deb$"
-        line: "Types: deb deb-src"
-        backrefs: true
+        replace: "Types: deb deb-src"
       failed_when: false
 
     - name: Update apt cache
@@ -91,7 +92,7 @@
       args:
         chdir: /home/{{ ansible_user }}/memcache-perf-dynamic
       async: 315360000 # Run for a long time (10 years)
-      poll: 0 # Don't wait for completio
+      poll: 0 # Don't wait for completion
       become: true
       become_user: "{{ ansible_user }}"
 
@@ -102,20 +103,13 @@
     memcached_server_ip: "{{ hostvars['memcache-server']['internal_ip'] }}"
     agent_server_ip: "{{ hostvars['client-agent']['internal_ip'] }}"
   tasks:
-    - name: Load memcached database with key-value pairs
-      ansible.builtin.command: >
-        ./mcperf -s {{ memcached_server_ip }} --loadonly
-      args:
-        chdir: /home/{{ ansible_user }}/memcache-perf-dynamic
-      become: true
-      become_user: "{{ ansible_user }}"
-
     - name: Create run script for dynamic load
       ansible.builtin.copy:
         dest: /home/{{ ansible_user }}/memcache-perf-dynamic/run_load.sh
         content: |
           #!/bin/bash
           cd /home/{{ ansible_user }}/memcache-perf-dynamic
+          ./mcperf -s {{ memcached_server_ip }} --loadonly
           {{ mcperf_command | default('./mcperf -s ' + memcached_server_ip + ' -a ' + agent_server_ip + ' --noload -T 8 -C 8 -D 4 -Q 1000 -c 8 -t 10 \
             --qps_interval 2 --qps_min 5000 --qps_max 180000') }}
         mode: "0755"
