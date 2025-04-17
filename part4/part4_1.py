@@ -45,46 +45,14 @@ def run_load(path: str):
             stderr=f
             )
 
-
-
-        # memcached_internal_ip = inventory["all"]["children"]["memcached_servers"]["hosts"]["memcache-server"]["ansible_host"]
-        # client_agent_internal_ip = inventory["all"]["children"]["client_agents"]["hosts"]["client-agent"]["internal_ip"]
-
-        # print(f"load data into memcached")
-        # subprocess.run([
-        #     "ssh",
-        #     "-i", "~/.ssh/cloud-computing",
-        #     f"ubuntu@{client_measure_external_ip}",
-        #     "cd memcache-perf-dynamic && ./mcperf -s 10.0.16.6 --loadonly"
-        # ], check=True)
-
-        # time.sleep(10)
-
-        # print(f"running load")
-
-        # with open(path, "w") as f:
-        #     # run the load and save the output to the path
-        #     subprocess.run([
-        #         "ssh",
-        #     "-i", "~/.ssh/cloud-computing",
-        #     f"ubuntu@{client_measure_external_ip}",
-        #     f"cd memcache-perf-dynamic && ./mcperf -s {memcached_internal_ip} -a {client_agent_internal_ip} --noload -T 8 -C 8 -D 4 -Q 1000 -c 8 -t 5 --scan 5000:220000:5000"
-        #     ], check=True,
-        #     stdout=f,
-        #     stderr=f
-        # )
-
-       
-
-
 def run_experiment(experiment: str, run: int = 1, output_dir: str = "output"):
-    print(f"running experiment {experiment} with run {run}")
+    print(f"[{int(time.time())}] running experiment {experiment} with run {run}")
     with open("ansible/inventory.yaml", "r") as f:
         inventory = yaml.safe_load(f)
         memcached_external_ip = inventory["all"]["children"]["memcached_servers"]["hosts"]["memcache-server"]["ansible_host"]
         memcached_internal_ip = inventory["all"]["children"]["memcached_servers"]["hosts"]["memcache-server"]["internal_ip"]
         
-        print(f"stopping memcached")
+        print(f"[{int(time.time())}] stopping memcached")
         # stop memcached
         subprocess.run([
             "ssh",
@@ -93,7 +61,7 @@ def run_experiment(experiment: str, run: int = 1, output_dir: str = "output"):
             "sudo systemctl stop memcached"
         ], check=True)
 
-        print(f"killing any remaining memcached processes")
+        print(f"[{int(time.time())}] killing any remaining memcached processes")
         # kill any remaining memcached processes
         subprocess.run([
             "ssh",
@@ -103,7 +71,7 @@ def run_experiment(experiment: str, run: int = 1, output_dir: str = "output"):
         ], check=True)
         time.sleep(5)
 
-        print(f"starting memcached")
+        print(f"[{int(time.time())}] starting memcached with {experiments[experiment]['Cores']} cores and {experiments[experiment]['Threads']} threads")
         # start memcached with correct command structure
         subprocess.run([
             "ssh",
@@ -112,15 +80,15 @@ def run_experiment(experiment: str, run: int = 1, output_dir: str = "output"):
             f"sudo taskset -c {experiments[experiment]['Cores']} memcached -d -t {experiments[experiment]['Threads']} -m 1024 -p 11211 -l {memcached_internal_ip} -u memcache"
         ], check=True)
         
-        print(f"waiting for 10 seconds")
+        print(f"[{int(time.time())}] waiting for 10 seconds")
         time.sleep(10)
 
-        print(f"running load")
+        print(f"[{int(time.time())}] running load")
         # run the load 
         run_load(f"{output_dir}/experiment{experiment}_run{run}.txt")
-        print(f"load finished")
+        print(f"[{int(time.time())}] load finished")
 
-        print(f"stopping memcached")
+        print(f"[{int(time.time())}] stopping memcached")
         # stop memcached
         subprocess.run([
             "ssh",
@@ -129,7 +97,7 @@ def run_experiment(experiment: str, run: int = 1, output_dir: str = "output"):
             "sudo systemctl stop memcached"
         ], check=True)
 
-        print(f"killing any remaining memcached processes")
+        print(f"[{int(time.time())}] killing any remaining memcached processes")
         # kill any remaining memcached processes
         subprocess.run([
             "ssh",
@@ -146,9 +114,8 @@ if __name__ == "__main__":
         for run in range(0, 3):
             path = f"output/experiment{experiment}_run{run}.txt"
             if os.path.exists(path):
-                print(f"skipping {path} because it already exists")
+                print(f"[{int(time.time())}] skipping {path} because it already exists")
                 continue
             run_experiment(experiment, run)
-
 
 
