@@ -91,7 +91,7 @@ Further the script will wait 60s between each run to ensure a particular run is 
 
 1. Follow the instructions in the handout and setup the cluster.
 2. Install mcperf-dynamic: `./part3/install_mcperf`.sh
-3. Run `./part3_experiment.sh`
+3. Run `./part3_experiment.sh <run_number>`
 4. Visualise the results: `python3 part3/analyze_results.py`
 
 ## Other Information
