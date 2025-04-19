@@ -13,10 +13,13 @@ fi
 run_number=$1
 
 # Constants
-RESULTS_DIR="part_3_results_group_020"
-LOG_FILE="experiment_${run_number}_log.txt"
+RESULTS_DIR="part3/logs/run_${run_number}"
+LOG_FILE="$RESULTS_DIR/experiment_${run_number}_log.txt"
 SSH_KEY_FILE="$HOME/.ssh/cloud-computing"
 ZONE="europe-west1-b"
+
+# Set timezone to GMT+2 for consistency with mcperf logs
+export TZ="Europe/Paris" # This is GMT+2 (CEST during summer)
 
 # Create results directory
 mkdir -p $RESULTS_DIR
@@ -149,6 +152,10 @@ run_experiment() {
 
     # 2. Start mcperf load generators on agents (in background)
     echo "Starting mcperf load generators..."
+    echo "Starting job timestamp monitor..."
+    chmod +x ./part3/monitor_jobs.sh
+    ./part3/monitor_jobs.sh $run_number &
+    JOB_MONITOR_PID=$!
 
     # Agent A load generator
     echo "Starting agent A load generator..."
