@@ -12,6 +12,7 @@
         name:
           - memcached
           - libmemcached-tools
+          - python3.12-venv
         state: present
 
     - name: Check memcached status
@@ -115,3 +116,31 @@
         mode: "0755"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
+
+- name: Install cpuUsageMeasurer
+  hosts: memcached_servers
+  become: true
+  tasks:
+    - name: Install cpuUsageMeasurer
+      ansible.builtin.copy:
+        src: cpuUsageMeasurer.py
+        dest: /home/{{ ansible_user }}/cpuUsageMeasurer.py
+        mode: "0755"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+    - name: Copy requirements.txt
+      ansible.builtin.copy:
+        src: requirements.txt
+        dest: /home/{{ ansible_user }}/requirements.txt
+    - name: Create virtual environment
+      ansible.builtin.command: python3 -m venv venv
+      args:
+        chdir: /home/{{ ansible_user }}
+      become: true
+      become_user: "{{ ansible_user }}"
+    - name: install dependencies
+      ansible.builtin.command: /home/{{ ansible_user }}/venv/bin/pip install -r /home/{{ ansible_user }}/requirements.txt
+      args:
+        chdir: /home/{{ ansible_user }}
+      become: true
+      become_user: "{{ ansible_user }}"
