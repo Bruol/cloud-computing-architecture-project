@@ -55,9 +55,6 @@ def get_batch_job_time_window(pods_file):
     return earliest_start, latest_completion
 
 
-from datetime import datetime, timedelta
-
-
 def parse_mcperf_data(mcperf_file, start_time, end_time):
     """Parse mcperf data file and extract 95th percentile latency data points."""
     data_points = []
