@@ -178,20 +178,56 @@ def create_plots(run_number):
         x_points = [p[0] for p in sorted_points]
         y_points = [p[1] for p in sorted_points]
 
-        # Plot the p95 latency line with markers
-        plt.plot(
-            x_points,
-            y_points,
-            color="#3080A0",
-            linestyle="-",
-            linewidth=2.5,
-            marker="o",
-            markersize=6,
-            markerfacecolor="#3080A0",
-            alpha=0.9,
-            label="Memcached p95 latency",
-            zorder=10,
-        )
+        # Filter to find points after x=0
+        filtered_points = [(x, y) for x, y in zip(x_points, y_points) if x >= 0]
+
+        # Find the first point shortly after job start (if any)
+        points_after_start = [(x, y) for x, y in zip(x_points, y_points) if x > 0]
+
+        # Make sure we have the exact point at x=0 (first job start)
+        if filtered_points and points_after_start:
+            # Find the closest point after x=0
+            closest_after = min(points_after_start, key=lambda p: p[0])
+
+            # Find points before x=0
+            points_before = [(x, y) for x, y in zip(x_points, y_points) if x < 0]
+
+            if points_before:
+                # Find the closest point before x=0
+                closest_before = max(points_before, key=lambda p: p[0])
+
+                # Interpolate a value at exactly x=0
+                x_before, y_before = closest_before
+                x_after, y_after = closest_after
+
+                # Linear interpolation to get y at x=0
+                slope = (y_after - y_before) / (x_after - x_before)
+                y_at_zero = y_before + slope * (0 - x_before)
+
+                # Insert the interpolated point at x=0
+                filtered_points = [(0, y_at_zero)] + filtered_points
+            else:
+                # If no points before x=0, use the first point after
+                filtered_points = [(0, closest_after[1])] + filtered_points
+
+        # Use only the filtered points for plotting
+        if filtered_points:
+            x_points = [p[0] for p in filtered_points]
+            y_points = [p[1] for p in filtered_points]
+            # Plot the p95 latency line with markers, starting at first job
+            plt.plot(
+                x_points,
+                y_points,
+                color="#3080A0",
+                linestyle="-",
+                linewidth=2.5,
+                marker="o",
+                markersize=6,
+                markerfacecolor="#3080A0",
+                alpha=0.9,
+                label="Memcached p95 latency",
+                zorder=10,
+            )
 
     # Calculate staggered y-positions for job labels to avoid overlap
     job_count = len(pod_info)
@@ -360,8 +396,13 @@ def create_plots(run_number):
             ha="center",
             va="bottom",
             fontsize=8,
-            bbox=dict(facecolor="white", alpha=0.8, boxstyle="round,pad=0.5", edgecolor="black",
-                    linewidth=2),
+            bbox=dict(
+                facecolor="white",
+                alpha=0.8,
+                boxstyle="round,pad=0.5",
+                edgecolor="black",
+                linewidth=2,
+            ),
         )
 
     # Add grid for better readability
