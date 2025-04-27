@@ -3,33 +3,27 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import json
+import pandas as pd
 from datetime import datetime
 import os
-from matplotlib.patches import Patch
-from matplotlib.lines import Line2D
+from matplotlib.ticker import FuncFormatter
 
-# Define colors for visualizing different PARSEC workloads
-JOB_COLORS = {
-    "parsec-blackscholes": "#CCA000",
-    "parsec-canneal": "#CCCCAA",
-    "parsec-dedup": "#CCACCA",
-    "parsec-ferret": "#AACCCA",
-    "parsec-freqmine": "#0CCA00",
-    "parsec-radix": "#00CCA0",
-    "parsec-vips": "#CC0A00",
-}
-
-# Node name mapping for better readability
-NODE_NAMES = {
-    "node-a-2core": "Node A (2 core)",
-    "node-b-2core": "Node B (2 core)",
-    "node-c-4core": "Node C (4 core)",
-    "node-d-4core": "Node D (4 core)",
+# Define colors for different workloads - using matplotlib's default color cycle for consistency
+WORKLOADS = ["ferret", "dedup", "canneal", "freqmine", "blackscholes", "radix", "vips"]
+# Define custom colors for each workload
+WORKLOAD_COLORS = {
+    "blackscholes": "#CCA000",  # Gold/amber
+    "canneal": "#CCCCAA",  # Light beige
+    "dedup": "#CCACCA",  # Light lavender
+    "ferret": "#AACCCA",  # Light sage
+    "freqmine": "#0CCA00",  # Bright green
+    "radix": "#00CCA0",  # Teal
+    "vips": "#CC0A00",  # Bright red
 }
 
 
 def parse_mcperf_data(file_path):
-    """Parse mcperf data with Unix epoch timestamps, applying a 2-hour correction."""
+    """Parse mcperf data into a pandas DataFrame."""
     data = []
     # Correction for the 2-hour time difference (2 hours = 7,200,000 milliseconds)
     TIME_CORRECTION_MS = 7200000
@@ -43,9 +37,23 @@ def parse_mcperf_data(file_path):
                 # Get raw Unix epoch timestamps in milliseconds and apply time correction
                 ts_start_ms = int(parts[-2]) - TIME_CORRECTION_MS
                 ts_end_ms = int(parts[-1]) - TIME_CORRECTION_MS
+                ts_mid_ms = (ts_start_ms + ts_end_ms) / 2
+
+                # Extract performance metrics
                 p95 = float(parts[12])
-                data.append((ts_start_ms, ts_end_ms, p95))
-    return data
+                qps = float(parts[16])  # QPS is typically the 2nd value
+
+                data.append(
+                    {
+                        "timestamp_ms": ts_mid_ms,
+                        "p95_us": p95,  # Store original microseconds
+                        "p95_ms": p95 / 1000,  # Convert to milliseconds
+                        "qps": qps,
+                    }
+                )
+
+    # Convert to DataFrame for easier manipulation
+    return pd.DataFrame(data)
 
 
 def parse_datetime(dt_str):
@@ -54,30 +62,29 @@ def parse_datetime(dt_str):
 
 
 def process_pods_file(file_path):
-    """Process a pods JSON file and extract job information with epoch timestamps."""
+    """Process a pods JSON file and extract job events with timestamps."""
     with open(file_path, "r") as f:
         data = json.load(f)
 
-    job_info = {}
+    job_events = []
     earliest_start_ms = None
 
     # Process each pod
     for pod in data.get("items", []):
-        # Check if the pod is part of a job
         metadata = pod.get("metadata", {})
         labels = metadata.get("labels", {})
 
-        # Find job name from labels
         job_name = labels.get("job-name") or labels.get("batch.kubernetes.io/job-name")
 
-        if job_name and "parsec" in job_name:  # Only consider parsec jobs
+        if job_name and any(workload in job_name for workload in WORKLOADS):
+            # Get the workload name without the "parsec-" prefix
+            workload_name = job_name.replace("parsec-", "")
+
             status = pod.get("status", {})
             spec = pod.get("spec", {})
 
-            # Try to get startTime from status
+            # Get start time
             start_time = status.get("startTime")
-
-            # If not available, check container statuses
             if not start_time:
                 for container in status.get("containerStatuses", []):
                     if "state" in container and "terminated" in container["state"]:
@@ -85,10 +92,7 @@ def process_pods_file(file_path):
                             start_time = container["state"]["terminated"]["startedAt"]
                             break
 
-            if not start_time:
-                continue
-
-            # Find container completion time
+            # Get end time
             completion_time = None
             for container in status.get("containerStatuses", []):
                 if "state" in container and "terminated" in container["state"]:
@@ -97,14 +101,11 @@ def process_pods_file(file_path):
                         break
 
             if start_time and completion_time:
-                # Convert to datetime and then to epoch milliseconds for consistency with mcperf
                 start_dt = parse_datetime(start_time)
                 completion_dt = parse_datetime(completion_time)
 
-                start_ms = int(start_dt.timestamp() * 1000)  # Convert to milliseconds
-                end_ms = int(
-                    completion_dt.timestamp() * 1000
-                )  # Convert to milliseconds
+                start_ms = int(start_dt.timestamp() * 1000)
+                end_ms = int(completion_dt.timestamp() * 1000)
 
                 # Get node information
                 node_name = spec.get("nodeName", "unknown")
@@ -113,15 +114,29 @@ def process_pods_file(file_path):
                 if earliest_start_ms is None or start_ms < earliest_start_ms:
                     earliest_start_ms = start_ms
 
-                # Store job information
-                job_info[job_name] = {
-                    "start_ms": start_ms,
-                    "end_ms": end_ms,
-                    "node": node_name,
-                    "exec_time_ms": end_ms - start_ms,
-                }
+                # Record start event
+                job_events.append(
+                    {
+                        "timestamp_ms": start_ms,
+                        "process_name": workload_name,
+                        "event": "START",
+                        "node": node_name,
+                    }
+                )
 
-    return job_info, earliest_start_ms
+                # Record end event
+                job_events.append(
+                    {
+                        "timestamp_ms": end_ms,
+                        "process_name": workload_name,
+                        "event": "FINISH",
+                        "node": node_name,
+                    }
+                )
+
+    # Convert to DataFrame
+    events_df = pd.DataFrame(job_events)
+    return events_df, earliest_start_ms
 
 
 def create_plots(run_number):
@@ -132,309 +147,244 @@ def create_plots(run_number):
         print(f"Missing files for run {run_number}. Skipping.")
         return
 
-    mcperf_data = parse_mcperf_data(mcperf_file)
-    pod_info, earliest_job_start_ms = process_pods_file(pods_file)
+    # Parse data into DataFrames
+    mcperf_df = parse_mcperf_data(mcperf_file)
+    events_df, earliest_start_ms = process_pods_file(pods_file)
 
-    if not mcperf_data or not pod_info:
+    if mcperf_df.empty or events_df.empty:
         print(f"No data found for run {run_number}. Skipping.")
         return
 
     # Print some debug info
     print(
-        f"Run {run_number}: Found {len(mcperf_data)} mcperf data points and {len(pod_info)} jobs"
+        f"Run {run_number}: Found {len(mcperf_df)} mcperf data points and {len(events_df) // 2} jobs"
     )
 
-    # Debug: Print time ranges to check for overlap
-    if mcperf_data:
-        mcperf_start = min(d[0] for d in mcperf_data)
-        mcperf_end = max(d[1] for d in mcperf_data)
-        print(f"  mcperf time range (after correction): {mcperf_start} to {mcperf_end}")
+    # Convert timestamps to seconds relative to first job start
+    mcperf_df["timestamp"] = (mcperf_df["timestamp_ms"] - earliest_start_ms) / 1000
+    events_df["timestamp"] = (events_df["timestamp_ms"] - earliest_start_ms) / 1000
 
-    if pod_info:
-        pod_start = min(info["start_ms"] for info in pod_info.values())
-        pod_end = max(info["end_ms"] for info in pod_info.values())
-        print(f"  pod time range: {pod_start} to {pod_end}")
+    # Filter to include only data after the first job start (with a margin for visibility)
+    mcperf_df = mcperf_df[
+        mcperf_df["timestamp"] >= 0
+    ]  # Only include data from job start
 
-    # Create a new figure
-    plt.figure(figsize=(14, 8))
-    plt.style.use("ggplot")
+    # Get list of unique workloads for the events plot
+    workloads = events_df["process_name"].unique()
 
-    # Use a line plot instead of bars for p95 latency
-    x_points, y_points = [], []
+    # Calculate experiment duration
+    if not events_df.empty:
+        duration = max(events_df["timestamp"]) + 20  # Add margin at end
+    else:
+        duration = max(mcperf_df["timestamp"]) + 20
 
-    for ts_start_ms, ts_end_ms, p95 in mcperf_data:
-        # Calculate the midpoint of each measurement interval
-        ts_mid_ms = (ts_start_ms + ts_end_ms) / 2
-        # Convert to seconds relative to the first job start
-        rel_mid_sec = (ts_mid_ms - earliest_job_start_ms) / 1000
+    # Create the figure with two subplots
+    fig = plt.figure(figsize=(10, 6))
+    # Create subplots with specific height ratios
+    axA_95p, ax_events = fig.subplots(2, 1, gridspec_kw={"height_ratios": [3, 1.5]})
 
-        # Store the data points for plotting
-        x_points.append(rel_mid_sec)
-        y_points.append(p95)
+    # Upper subplot: P95 latency and QPS
+    axA_95p.set_title(f"Run {run_number} Visualization")
+    axA_95p.set_xlim([0, duration])
+    axA_95p.set_xlabel("Time [s]")
+    axA_95p.set_xticks(np.arange(0, duration + 1, 50))
+    axA_95p.grid(True, alpha=0.3)
+    axA_95p.set_ylabel("95th Percentile Latency [ms]")
+    axA_95p.tick_params(axis="y", labelcolor="tab:blue")
 
-    # Sort points by x-value for proper line connection
-    if x_points:
-        sorted_points = sorted(zip(x_points, y_points))
-        x_points = [p[0] for p in sorted_points]
-        y_points = [p[1] for p in sorted_points]
+    # Set y-axis limits and ticks for latency
+    max_latency = max(3.2, mcperf_df["p95_ms"].max() * 1.1)
+    axA_95p.set_ylim([0, max_latency])
+    axA_95p.set_yticks(np.arange(0, max_latency + 0.1, 0.4))
 
-        # Filter to find points after x=0
-        filtered_points = [(x, y) for x, y in zip(x_points, y_points) if x >= 0]
+    # Plot P95 latency line
+    (artistA_95p,) = axA_95p.plot(
+        mcperf_df["timestamp"],
+        mcperf_df["p95_ms"],
+        "o-",
+        color="tab:blue",
+        label="95 percentile latency",
+    )
 
-        # Find the first point shortly after job start (if any)
-        points_after_start = [(x, y) for x, y in zip(x_points, y_points) if x > 0]
+    # Add SLO threshold line (1ms)
+    # axA_95p.axhline(y=1.0, color="red", linestyle="-", linewidth=1.5)
+    slo_line = axA_95p.axhline(y=1.0, color="red", linestyle="-", linewidth=1.5)
 
-        # Make sure we have the exact point at x=0 (first job start)
-        if filtered_points and points_after_start:
-            # Find the closest point after x=0
-            closest_after = min(points_after_start, key=lambda p: p[0])
+    # Add QPS on secondary y-axis
+    axA_QPS = axA_95p.twinx()
+    axA_QPS.set_ylabel("Queries per second")
 
-            # Find points before x=0
-            points_before = [(x, y) for x, y in zip(x_points, y_points) if x < 0]
+    # Scale QPS axis appropriately
+    max_qps = max(40000, mcperf_df["qps"].max() * 1.1)
+    axA_QPS.set_ylim([0, max_qps])
+    axA_QPS.set_yticks(np.arange(0, max_qps + 1, 5000))
+    axA_QPS.yaxis.set_major_formatter(
+        FuncFormatter(lambda x_val, tick_pos: "{:.0f}k".format(x_val / 1000))
+    )
+    axA_QPS.tick_params(axis="y", labelcolor="tab:orange")
+    axA_QPS.grid(False)
 
-            if points_before:
-                # Find the closest point before x=0
-                closest_before = max(points_before, key=lambda p: p[0])
+    # Plot QPS points
+    artistA_QPS = axA_QPS.scatter(
+        mcperf_df["timestamp"], mcperf_df["qps"], color="tab:orange", label="QPS"
+    )
 
-                # Interpolate a value at exactly x=0
-                x_before, y_before = closest_before
-                x_after, y_after = closest_after
+    # Add legend with SLO line included
+    axA_QPS.legend(
+        [artistA_QPS, artistA_95p, slo_line],
+        ["QPS", "95 percentile latency", "SLO (1ms)"],
+        loc="upper right",
+    )
 
-                # Linear interpolation to get y at x=0
-                slope = (y_after - y_before) / (x_after - x_before)
-                y_at_zero = y_before + slope * (0 - x_before)
+    # Lower subplot: Job timeline
+    ax_events.set_xlim([0, duration])
+    ax_events.set_xticks(np.arange(0, duration + 1, 50))
+    ax_events.grid(True, alpha=0.3)
 
-                # Insert the interpolated point at x=0
-                filtered_points = [(0, y_at_zero)] + filtered_points
-            else:
-                # If no points before x=0, use the first point after
-                filtered_points = [(0, closest_after[1])] + filtered_points
+    # Prepare workloads list for y-axis
+    displayed_workloads = sorted(list(workloads))
+    ax_events.set_yticks(range(len(displayed_workloads)))
+    ax_events.set_yticklabels(displayed_workloads)
+    ax_events.set_ylim([-0.5, len(displayed_workloads) - 0.5])
 
-        # Use only the filtered points for plotting
-        if filtered_points:
-            x_points = [p[0] for p in filtered_points]
-            y_points = [p[1] for p in filtered_points]
-            # Plot the p95 latency line with markers, starting at first job
-            plt.plot(
-                x_points,
-                y_points,
-                color="#3080A0",
-                linestyle="-",
-                linewidth=2.5,
+    # Plot job timelines as bars
+    for idx, name in enumerate(displayed_workloads):
+        # Get all events for this workload
+        job_events = events_df[events_df["process_name"] == name]
+
+        # Use a consistent color from matplotlib's color cycle
+        color = WORKLOAD_COLORS.get(name, f"C{idx % 10}")
+
+        # Group events by pairs (start/finish)
+        start_events = job_events[job_events["event"] == "START"].sort_values(
+            "timestamp"
+        )
+        end_events = job_events[job_events["event"] == "FINISH"].sort_values(
+            "timestamp"
+        )
+
+        # Plot horizontal bars for each job instance
+        for i in range(min(len(start_events), len(end_events))):
+            start_time = start_events.iloc[i]["timestamp"]
+            end_time = end_events.iloc[i]["timestamp"]
+            duration = end_time - start_time
+
+            # Get node information
+            node_name = start_events.iloc[i]["node"]
+            # Clean up node name for display (remove common prefixes)
+            display_node = node_name
+            if node_name.startswith("node-"):
+                display_node = node_name.replace("node-", "")
+
+            # Draw the horizontal job bar
+            ax_events.barh(
+                idx,  # Y position
+                duration,  # Width = duration
+                height=0.6,  # Height of the bar
+                left=start_time,  # X position = start time
+                color=color,  # Bar color
+                alpha=0.7,  # Transparency
+                edgecolor=color,  # Border color
+                linewidth=1.5,  # Border width
+            )
+
+            # Add node name inside the bar if there's enough space
+
+            if duration > 15:  # Long enough for text inside
+                text_x = start_time + duration / 2
+                ax_events.text(
+                    text_x,
+                    idx,
+                    display_node,
+                    ha="center",
+                    va="center",
+                    fontsize=7,
+                    fontweight="bold",
+                    color="black",
+                    bbox=dict(boxstyle="round,pad=0.1", fc=color, ec="none", alpha=0.8),
+                )
+            else:  # Short bar - place text after with constraint
+                # Extend plot width to fit labels
+                plot_end = max(ax_events.get_xlim()[1], end_time + 40)
+                ax_events.set_xlim([0, plot_end])
+
+                # Limited-width text label
+                text_x = end_time + 2
+                ax_events.text(
+                    text_x,
+                    idx,
+                    display_node,  # Limit text length
+                    ha="left",
+                    va="center",
+                    fontsize=7,
+                    fontweight="bold",
+                    color="black",
+                    bbox=dict(
+                        boxstyle="round,pad=0.1",
+                        fc="white",
+                        ec=color,
+                        linewidth=1,
+                        alpha=0.9,
+                    ),
+                )
+
+            # Add markers for start and end
+            ax_events.scatter(
+                [start_time],
+                [idx],
+                c="white",
+                edgecolor=color,
                 marker="o",
-                markersize=6,
-                markerfacecolor="#3080A0",
-                alpha=0.9,
-                label="Memcached p95 latency",
+                s=30,
                 zorder=10,
             )
-
-    # Calculate staggered y-positions for job labels to avoid overlap
-    job_count = len(pod_info)
-    y_positions = {}
-
-    # First, sort jobs by start time
-    sorted_jobs = sorted(pod_info.items(), key=lambda x: x[1]["start_ms"])
-
-    # Assign staggered y-positions - use a wider range
-    for i, (job_name, _) in enumerate(sorted_jobs):
-        # Create staggered positions between 300 and 900 μs
-        y_positions[job_name] = 500 + (i * 100) % 600
-
-    # Used to track unique jobs for the legend
-    seen_jobs = set()
-    legend_elements = []
-
-    # Add job annotations
-    for job_name, info in sorted_jobs:
-        # Convert to seconds for the plot
-        rel_start_sec = (info["start_ms"] - earliest_job_start_ms) / 1000
-        rel_end_sec = (info["end_ms"] - earliest_job_start_ms) / 1000
-        job_duration_sec = rel_end_sec - rel_start_sec
-
-        color = JOB_COLORS.get(job_name, "white")  # Default to white if not found
-        short_name = job_name.replace("parsec-", "")
-
-        # Format node name nicely if possible
-        node_display = NODE_NAMES.get(info["node"], info["node"])
-
-        # Add colored background for job duration
-        plt.axvspan(rel_start_sec, rel_end_sec, color=color, alpha=0.2, zorder=1)
-
-        # Add vertical lines for start and end times
-        plt.axvline(
-            x=rel_start_sec,
-            color=color,
-            linestyle="-.",
-            alpha=0.9,
-            zorder=2,
-            linewidth=2.5,
-        )
-        plt.axvline(
-            x=rel_end_sec,
-            color=color,
-            linestyle="-.",
-            alpha=0.9,
-            zorder=2,
-            linewidth=2.5,
-        )
-
-        # Use the pre-calculated y-position to avoid overlaps
-        y_pos = y_positions[job_name]
-
-        # Add text annotation with job name and node - place in the middle if job is wide enough
-        if (
-            job_duration_sec >= 5
-        ):  # If job is at least 5 seconds long, place text in middle
-            mid_point = (rel_start_sec + rel_end_sec) / 2
-            plt.text(
-                mid_point,
-                y_pos,
-                f"{short_name}\n({node_display})",
-                ha="center",
-                va="center",
-                fontsize=9,
-                fontweight="bold",
-                bbox=dict(
-                    facecolor="white",
-                    alpha=0.9,
-                    boxstyle="round,pad=0.3",
-                    edgecolor=color,
-                    linewidth=2,
-                ),
+            ax_events.scatter(
+                [end_time],
+                [idx],
+                c="white",
+                edgecolor=color,
+                marker="x",
+                s=30,
+                zorder=10,
             )
-        else:  # For short jobs, place text above the end marker with a pointer
-            plt.text(
-                rel_end_sec + 1,
-                y_pos,
-                f"{short_name}\n({node_display})",
-                ha="left",
-                va="center",
-                fontsize=9,
-                fontweight="bold",
-                bbox=dict(
-                    facecolor="white",
-                    alpha=0.9,
-                    boxstyle="round,pad=1",
-                    edgecolor=color,
-                    linewidth=2,
-                ),
-            )
-            # Add an arrow pointing to the job
-            plt.annotate(
-                "",
-                xy=(rel_end_sec, y_pos),
-                xytext=(rel_end_sec + 0.9, y_pos),
-                arrowprops=dict(arrowstyle="->", color=color, linewidth=1.5),
-            )
+    # Add vertical line at time 0 (first job start)
+    axA_95p.axvline(x=0, color="black", linestyle=":", linewidth=1.0)
+    ax_events.axvline(x=0, color="black", linestyle=":", linewidth=1.0)
 
-        # Add to legend if we haven't seen this job type before
-        if short_name not in seen_jobs:
-            seen_jobs.add(short_name)
-            legend_elements.append(Patch(facecolor=color, alpha=0.5, label=short_name))
-
-    # Add SLO threshold line
-    plt.axhline(y=1000, color="r", linestyle="-", linewidth=1.5)
-    legend_elements.append(
-        Line2D(
-            [0],
-            [0],
-            color="red",
-            linestyle="-",
-            linewidth=1.5,
-            label="SLO Threshold (1ms)",
-        )
+    # Add label for first job start
+    ax_events.text(
+        0,
+        -0.5,
+        "First Job Start",
+        ha="center",
+        va="top",
+        fontsize=8,
+        bbox=dict(
+            facecolor="white", alpha=0.8, edgecolor="black", boxstyle="round,pad=0.3"
+        ),
     )
 
-    # Add p95 latency to legend
-    legend_elements.append(
-        Line2D(
-            [0],
-            [0],
-            color="#3080A0",
-            linestyle="-",
-            linewidth=2.5,
-            marker="o",
-            markersize=6,
-            label="p95 latency",
-        )
-    )
-
-    # Set labels and title
-    plt.xlabel("Time Since First Job Start (seconds)", fontsize=12)
-    plt.ylabel("p95 Latency (μs)", fontsize=12)
-    plt.title(
-        f"Run #{run_number}: Memcached p95 Latency with Batch Job Activity", fontsize=14
-    )
-
-    # Set y-axis limit to 1.6ms to show SLO violations clearly
-    plt.ylim(0, 1600)
-
-    # Set x-axis limits
-    if x_points:
-        min_x = min(-5, min(x_points) - 5)  # Show at most 5 seconds before first job
-        max_x = max(
-            60,
-            max(
-                [
-                    (info["end_ms"] - earliest_job_start_ms) / 1000
-                    for info in pod_info.values()
-                ]
-            )
-            + 15,
-        )
-        plt.xlim(min_x, max_x)
-
-        # Add a vertical line at x=0 to highlight the first job start
-        plt.axvline(
-            x=0, color="black", linestyle=":", linewidth=1.0, alpha=0.6, zorder=0
-        )
-        plt.text(
-            0,
-            100,
-            "First Job Start",
-            ha="center",
-            va="bottom",
-            fontsize=8,
-            bbox=dict(
-                facecolor="white",
-                alpha=0.8,
-                boxstyle="round,pad=0.5",
-                edgecolor="black",
-                linewidth=2,
-            ),
-        )
-
-    # Add grid for better readability
-    plt.grid(True, linestyle="--", alpha=0.3)
-
-    # Add legend with proper formatting
-    plt.legend(
-        handles=legend_elements,
-        bbox_to_anchor=(1.02, 1),
-        loc="upper left",
-        fontsize=9,
-        framealpha=0.7,
-    )
-
-    # Save and close the figure
+    # Adjust layout
+    plt.subplots_adjust(hspace=0.3)
     plt.tight_layout()
+
+    # Save figure
     output_path = f"memcached_latency_run_{run_number}.png"
-    plt.savefig(output_path, dpi=1000, bbox_inches="tight")
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close()
 
-    print(f"Created p95 latency plot for run {run_number} -> {output_path}")
+    print(f"Created visualization for run {run_number} -> {output_path}")
 
     # Print summary statistics
-    if y_points:
-        slo_violations = sum(1 for p95 in y_points if p95 > 1000.0)  # > 1000 μs = > 1ms
+    if not mcperf_df.empty:
+        slo_violations = sum(mcperf_df["p95_ms"] > 1.0)
 
-        print(f"  Total measurements: {len(y_points)}")
+        print(f"  Total measurements: {len(mcperf_df)}")
         print(
-            f"  SLO violations (>1ms): {slo_violations} ({slo_violations/len(y_points)*100:.1f}%)"
+            f"  SLO violations (>1ms): {slo_violations} ({slo_violations/len(mcperf_df)*100:.1f}%)"
         )
         print(
-            f"  Min/Avg/Max p95 latency: {min(y_points):.1f}/{np.mean(y_points):.1f}/{max(y_points):.1f} μs"
+            f"  Min/Avg/Max p95 latency: {mcperf_df['p95_ms'].min():.2f}/{mcperf_df['p95_ms'].mean():.2f}/{mcperf_df['p95_ms'].max():.2f} ms"
         )
 
 
