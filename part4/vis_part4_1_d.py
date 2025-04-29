@@ -4,6 +4,10 @@ import os
 import numpy as np
 import csv
 from collections import defaultdict
+import sys
+
+
+COLORS = ['#CCA000', '#CCACCA']
 
 def read_cpu_usage(file_path: str, cores: list[int]):
     """Read CPU usage data from CSV file and return as a list of (timestamp, cpu_percentages) tuples."""
@@ -53,11 +57,54 @@ def calculate_avg_cpu_usage(cpu_data, start_time, end_time):
         return 0
     return sum(relevant_data) / len(relevant_data)
 
-def main():
+def aggregate_qps_data(qps_data, latency_data, cpu_data, window_size):
+    """Aggregate data points where QPS values are within a specified window size."""
+    # Sort all data by QPS
+    combined_data = list(zip(qps_data, latency_data, cpu_data))
+    combined_data.sort(key=lambda x: x[0])
+    
+    aggregated_qps = []
+    aggregated_latency = []
+    aggregated_cpu = []
+    
+    current_window = []
+    current_qps = None
+    
+    for qps, latency, cpu in combined_data:
+        if current_qps is None or abs(qps - current_qps) <= window_size:
+            current_window.append((qps, latency, cpu))
+            current_qps = qps
+        else:
+            # Calculate averages for the current window
+            avg_qps = np.mean([x[0] for x in current_window])
+            avg_latency = np.mean([x[1] for x in current_window])
+            avg_cpu = np.mean([x[2] for x in current_window])
+            
+            aggregated_qps.append(avg_qps)
+            aggregated_latency.append(avg_latency)
+            aggregated_cpu.append(avg_cpu)
+            
+            # Start new window
+            current_window = [(qps, latency, cpu)]
+            current_qps = qps
+    
+    # Process the last window
+    if current_window:
+        avg_qps = np.mean([x[0] for x in current_window])
+        avg_latency = np.mean([x[1] for x in current_window])
+        avg_cpu = np.mean([x[2] for x in current_window])
+        
+        aggregated_qps.append(avg_qps)
+        aggregated_latency.append(avg_latency)
+        aggregated_cpu.append(avg_cpu)
+    
+    return aggregated_qps, aggregated_latency, aggregated_cpu
+
+def main(window_size: int):
     # Define the configurations
     configs = {
-        "experiment1Core2Threads": {"T": 2, "C": 1, "label": "Threads = 2, Cores = 1"},
-        "experiment2Cores2Threads": {"T": 2, "C": 2, "label": "Threads = 2, Cores = 2"},
+        "experiment1Core2Threads": {"T": 2, "C": 1, "label": "2 Threads, 1 Core"},
+        "experiment2Cores2Threads": {"T": 2, "C": 2, "label": "2 Threads, 2 Cores"},
     }
     
     # Create a figure with two subplots
@@ -115,6 +162,8 @@ def main():
             avg_latency.append(np.mean(latency_data[target]))
             avg_cpu_usage.append(np.mean(cpu_data[target]))
 
+        # Aggregate data points within 5k QPS windows
+        avg_qps, avg_latency, avg_cpu_usage = aggregate_qps_data(avg_qps, avg_latency, avg_cpu_usage, window_size)
         
         # Create the primary y-axis for latency
         ax1 = axs[i]
@@ -124,20 +173,20 @@ def main():
         
         # Create bar plot for CPU usage first (behind)
         ax2.errorbar(avg_qps, avg_cpu_usage,
-                    label="CPU Usage", color='green',
-                    marker='s', linestyle='--', linewidth=1.5, markersize=5,
+                    label="CPU Usage", color=COLORS[1],
+                    linestyle='-', linewidth=2, solid_capstyle='round',
                     capsize=3, capthick=1, elinewidth=1, zorder=1)
         
         # Create the latency plot on top
         ax1.errorbar(avg_qps, avg_latency,
-                    label="Latency", color=colors[i], 
-                    marker='o', linestyle='-', linewidth=1.5, markersize=5,
+                    label="Latency", color=COLORS[0], 
+                    marker='o', linestyle='-', linewidth=2, markersize=5,
                     capsize=3, capthick=1, elinewidth=1, zorder=2)
         
         # Set labels and title for each subplot
         ax1.set_xlabel('Achieved QPS', fontsize=12)
-        ax1.set_ylabel('95th Percentile Latency (μs)', fontsize=12, color=colors[i])
-        ax2.set_ylabel('Average CPU Usage (%)', fontsize=12, color='green')
+        ax1.set_ylabel('95th Percentile Latency (μs)', fontsize=12, color=COLORS[0])
+        ax2.set_ylabel('Average CPU Usage (%)', fontsize=12, color=COLORS[1])
         axs[i].set_title(f'Memcached Performance: {config["label"]}', fontsize=14)
         
         # Set x-axis limits from 0 to 230000
@@ -172,4 +221,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # check if w is in the args and take next arg as window size        
+    args = sys.argv[1:]
+    window_size = 1
+    if "-w" in args:
+        window_size = int(args[args.index("-w") + 1])
+
+    print(f"Window size: {window_size}")
+    main(window_size)
