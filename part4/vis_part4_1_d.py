@@ -7,7 +7,7 @@ from collections import defaultdict
 import sys
 
 
-COLORS = ['#CCA000', '#CCACCA']
+COLORS = ['tab:blue', 'tab:orange']
 
 def read_cpu_usage(file_path: str, cores: list[int]):
     """Read CPU usage data from CSV file and return as a list of (timestamp, cpu_percentages) tuples."""
