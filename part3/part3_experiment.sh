@@ -18,8 +18,6 @@ LOG_FILE="$RESULTS_DIR/experiment_${run_number}_log.txt"
 SSH_KEY_FILE="$HOME/.ssh/cloud-computing"
 ZONE="europe-west1-b"
 
-# Set timezone to GMT+2 for consistency with mcperf logs
-export TZ="Europe/Paris" # This is GMT+2 (CEST during summer)
 
 # Create results directory
 mkdir -p $RESULTS_DIR

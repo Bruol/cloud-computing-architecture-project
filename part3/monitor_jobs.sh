@@ -4,11 +4,7 @@ run_number=$1
 results_dir="part3/logs/run_${run_number}"
 job_log_file="${results_dir}/job_timestamps_${run_number}.txt"
 
-# Ensure we're using GMT+2 timezone for consistency with mcperf
-export TZ="Europe/Paris" # This is GMT+2 (CEST during summer)
-
 # Initialize log file
-echo "Job Timestamps (GMT+2)" >$job_log_file
 echo "======================" >>$job_log_file
 echo "Format: job_name, status, timestamp" >>$job_log_file
 
