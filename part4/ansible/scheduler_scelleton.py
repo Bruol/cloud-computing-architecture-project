@@ -5,24 +5,41 @@ import psutil
 import docker
 import time
 
-jobs = {
+from typing import Dict, Optional, Union
+from docker.models.containers import Container
+
+JobInfo = Dict[str, Union[str, bool, Optional[Container]]]
+
+jobs: Dict[str, JobInfo] = {
     "blackscholes": {
         "image": "anakli/cca:parsec_blackscholes",
+        "completed": False,
+        "container": None,
     },
     "canneal": {
-        "image": "anakli/cca:parsec_canneal",
+        "image": "anakli/cca:parsec_canneal", 
+        "completed": False,
+        "container": None,
     },
     "dedup": {
         "image": "anakli/cca:parsec_dedup",
+        "completed": False,
+        "container": None,
     },
     "ferret": {
         "image": "anakli/cca:parsec_ferret",
+        "completed": False,
+        "container": None,
     },
     "radix": {
         "image": "anakli/cca:splash2x_radix",
+        "completed": False,
+        "container": None,
     },
     "vips": {
         "image": "anakli/cca:parsec_vips",
+        "completed": False,
+        "container": None,
     },
 }
 
@@ -61,11 +78,12 @@ def main():
     while True:
         cpu_usage = psutil.cpu_percent(interval=1, percpu=True)
         
-        # start jobs
-        # change the cpu affinity of the memcached process as neccessary
-        # pause jobs
-        # unpause jobs
-        # check if the jobs are done
+        # TODO: log events for later analysis
+        # TODO: start jobs
+        # TODO: change the cpu affinity of the memcached process as neccessary
+        # TODO: pause jobs
+        # TODO: unpause jobs
+        # TODO: check if the jobs are done
 
 
 
