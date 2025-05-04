@@ -42,7 +42,7 @@ class JobManager:
             self._jobs.remove(job)
 
     def _handle_interrupt(self, signum, frame):
-        logger.info(f"Received interrupt signal {signum} stopping all jobs")
+        logger.error(f"Received interrupt signal {signum} stopping all jobs")
         self.cleanup_all()
         sys.exit(0)
 

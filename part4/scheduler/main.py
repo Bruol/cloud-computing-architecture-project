@@ -10,6 +10,23 @@ from job import JobInfo
 from policy import Policy
 import logging
 import sys
+from colorama import init, Fore, Style
+
+# Initialize colorama
+init()
+
+# Custom formatter with colors
+class ColoredFormatter(logging.Formatter):
+    def format(self, record):
+        if record.levelno == logging.INFO:
+            record.levelname = f"{Fore.GREEN}{record.levelname}{Style.RESET_ALL}"
+        elif record.levelno == logging.WARNING:
+            record.levelname = f"{Fore.YELLOW}{record.levelname}{Style.RESET_ALL}"
+        elif record.levelno == logging.ERROR:
+            record.levelname = f"{Fore.RED}{record.levelname}{Style.RESET_ALL}"
+        elif record.levelno == logging.DEBUG:
+            record.levelname = f"{Fore.BLUE}{record.levelname}{Style.RESET_ALL}"
+        return super().format(record)
 
 logger = logging.getLogger(__name__)
 
@@ -90,13 +107,19 @@ def set_memcached_cpu_affinity(pid: int, cores: str):
 
 def main(policy: Policy):
     # log to a file (scheduler_04052025_17h36.log) with epoch time
+    formatter = ColoredFormatter(f"[{time.time()}] [policy: {policy.policy_name}] [%(levelname)s] [%(name)s] %(message)s")
+    
+    # File handler without colors
+    file_handler = logging.FileHandler(f"scheduler_{time.strftime('%d%m%Y_%H%M')}.log")
+    file_handler.setFormatter(logging.Formatter(f"[{time.time()}] [policy: {policy.policy_name}] [%(levelname)s] [%(name)s] %(message)s"))
+    
+    # Console handler with colors
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(formatter)
+    
     logging.basicConfig(
-        level=logging.INFO, 
-        format=f"[{time.time()}] [{policy.policy_name}] [%(name)s] %(message)s", 
-        handlers=[
-            logging.FileHandler(f"scheduler_{time.strftime('%d%m%Y_%H%M')}.log"),
-            logging.StreamHandler(sys.stdout)
-        ]
+        level=logging.INFO,
+        handlers=[file_handler, console_handler]
     )
 
     #memcached_pid = get_memcached_pid()
