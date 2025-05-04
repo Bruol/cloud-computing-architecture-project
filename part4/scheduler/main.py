@@ -18,30 +18,37 @@ jobs: Dict[str, JobInfo] = {
     "blackscholes": {
         "image": "anakli/cca:parsec_blackscholes",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p blackscholes -i native -n {threads}"],
+        "paralellizability": 1,
     },
     "canneal": {
         "image": "anakli/cca:parsec_canneal", 
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p canneal -i native -n {threads}"],
+        "paralellizability": 1,
     },
     "dedup": {
         "image": "anakli/cca:parsec_dedup",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p dedup -i native -n {threads}"],
+        "paralellizability": 1,
     },
     "ferret": {
         "image": "anakli/cca:parsec_ferret",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p ferret -i native -n {threads}"],
+        "paralellizability": 2,
     },
     "freqmine": {
         "image": "anakli/cca:parsec_freqmine",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p freqmine -i native -n {threads}"],
+        "paralellizability": 2,
     },
     "radix": {
         "image": "anakli/cca:splash2x_radix",
         "command": ["/bin/sh", "-c", "./run -a run -S splash2x -p radix -i native -n {threads}"],
+        "paralellizability": 2,
     },
     "vips": {
         "image": "anakli/cca:parsec_vips",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p vips -i native -n {threads}"],
+        "paralellizability": 2,
     },
 }
 
