@@ -17,7 +17,7 @@ class JobStatus(enum.Enum):
     ERROR = "error"
 
 class JobInstance:
-    def __init__(self, jobName: str, image: str, command: list[str], docker_client: DockerClient = docker.from_env()):
+    def __init__(self, jobName: str, image: str, command: list[str], threads: int, docker_client: DockerClient = docker.from_env()):
         self._jobName = jobName
         self._image = image
         self._command = command
@@ -26,7 +26,7 @@ class JobInstance:
         self._docker_client = docker_client
         self._cores = None
         self._error_count = 0
-        self._threads = 1
+        self._threads = threads
 
     # TODO: test this
     def start_job(self, cores: str):

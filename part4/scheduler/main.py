@@ -5,7 +5,9 @@ import psutil
 import time
 from typing import Dict
 from policy_1_2_cores import Policy1And2Cores
+from policy_2_3_cores import Policy2And3Cores
 from job import JobInfo
+from policy import Policy
 import logging
 
 
@@ -16,36 +18,43 @@ CPU_HIGH = 140
 
 jobs: Dict[str, JobInfo] = {
     "blackscholes": {
+        "name": "blackscholes",
         "image": "anakli/cca:parsec_blackscholes",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p blackscholes -i native -n {threads}"],
         "paralellizability": 1,
     },
     "canneal": {
+        "name": "canneal",
         "image": "anakli/cca:parsec_canneal", 
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p canneal -i native -n {threads}"],
         "paralellizability": 1,
     },
     "dedup": {
+        "name": "dedup",
         "image": "anakli/cca:parsec_dedup",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p dedup -i native -n {threads}"],
         "paralellizability": 1,
     },
     "ferret": {
+        "name": "ferret",
         "image": "anakli/cca:parsec_ferret",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p ferret -i native -n {threads}"],
         "paralellizability": 2,
     },
     "freqmine": {
+        "name": "freqmine",
         "image": "anakli/cca:parsec_freqmine",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p freqmine -i native -n {threads}"],
         "paralellizability": 2,
     },
     "radix": {
+        "name": "radix",
         "image": "anakli/cca:splash2x_radix",
         "command": ["/bin/sh", "-c", "./run -a run -S splash2x -p radix -i native -n {threads}"],
         "paralellizability": 2,
     },
     "vips": {
+        "name": "vips",
         "image": "anakli/cca:parsec_vips",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p vips -i native -n {threads}"],
         "paralellizability": 2,
@@ -79,7 +88,7 @@ def set_memcached_cpu_affinity(pid: int, cores: str):
 
 
 
-def main():
+def main(policy: Policy):
     # log to a file (scheduler_04052025_17h36.log) with epoch time
     logging.basicConfig(level=logging.INFO, format=f"{time.time()} -- %(message)s", filename=f"scheduler_{time.strftime('%d%m%Y_%H%M')}.log")
 
@@ -89,12 +98,17 @@ def main():
     set_memcached_cpu_affinity(memcached_pid, "0")
     logger.info(f"Memcached CPU affinity set to 0")
 
-    # Initialize policies
-    policy_1_2 = Policy1And2Cores()
-    
-    
+    for job in jobs:
+        policy.add_job(jobs[job])
+
+    logger.info("Starting scheduler")
+
+    start_time = time.time()
+
     while True:
         cpu_usage = psutil.cpu_percent(interval=1, percpu=True)
+
+        logger.info(f"CPU usage: {cpu_usage}")
 
         if memcached_target_cores == 1 and cpu_usage[0] > CPU_LOW:
             memcached_target_cores = 2
@@ -102,14 +116,26 @@ def main():
             memcached_target_cores = 1
        
 
-        # TODO: log events for later analysis
-        # TODO: start jobs
-        # TODO: change the cpu affinity of the memcached process as neccessary
-        # TODO: pause jobs
-        # TODO: unpause jobs
-        # TODO: check if the jobs are done
+        available_cores = set(range(len(cpu_usage)))-set(range(memcached_target_cores))
+        
+        logger.info(f"Available cores: {available_cores}")
 
+        policy.schedule(available_cores)
+
+        if policy.isCompleted:
+            break
+
+
+    end_time = time.time()
+    logger.info(f"Scheduler completed in {end_time - start_time} seconds")
 
 
 if __name__ == "__main__":
-    main()
+
+    # Initialize policies
+    policy1 = Policy1And2Cores()
+    policy2 = Policy2And3Cores()
+
+    main(policy1)
+
+    main(policy2)

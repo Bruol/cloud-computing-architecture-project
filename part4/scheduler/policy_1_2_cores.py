@@ -9,15 +9,17 @@ from typing import List, Dict, Optional
 from job import JobInstance, JobStatus
 import logging
 from job import JobInfo
-
+from policy import Policy
 logger = logging.getLogger(__name__)
 
-class Policy1And2Cores:
+
+class Policy1And2Cores(Policy):
     def __init__(self):
         self.one_core_queue: List[JobInstance] = []
         self.two_core_queue: List[JobInstance] = []
         self.running_one_core: Optional[JobInstance] = None
         self.running_two_core: Optional[JobInstance] = None
+        self.isCompleted = False
 
     def add_job(self, job: JobInfo):
         """Add a job to the appropriate queue based on its paralellizability."""
@@ -26,7 +28,6 @@ class Policy1And2Cores:
             self.one_core_queue.append(job_instance)
         elif job["paralellizability"] == 2:
             self.two_core_queue.append(job_instance)
-
 
 
     def schedule(self, available_cores: set[int]):
@@ -38,6 +39,10 @@ class Policy1And2Cores:
         """
         # Check for completed jobs and free up cores
         self._check_completed_jobs()
+
+        if len(self.one_core_queue) == 0 and len(self.two_core_queue) == 0 and self.running_one_core is None and self.running_two_core is None:
+            self.isCompleted = True
+            return
         
         # Sort available cores
         sorted_cores = sorted(available_cores)
@@ -84,7 +89,7 @@ class Policy1And2Cores:
                     self.running_two_core.update_job_cpus(f"{sorted_cores[0]},{sorted_cores[1]}")
                 elif self.running_two_core is None and self.running_one_core and self.running_one_core._status != JobStatus.COMPLETED:
                     self.running_one_core.update_job_cpus(f"{sorted_cores[0]},{sorted_cores[1]}")
-                return
+                return 
 
             # Pause running 1-core job if exists
             if self.running_one_core and self.running_one_core._status == JobStatus.RUNNING:
@@ -100,7 +105,7 @@ class Policy1And2Cores:
                     self.running_two_core = self.one_core_queue.pop(0)
                     self.running_two_core.start_job(f"{sorted_cores[0]},{sorted_cores[1]}")
 
-       
+        return
 
     def _check_completed_jobs(self):
         """Check for completed jobs and update running jobs accordingly."""
