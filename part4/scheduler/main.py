@@ -9,7 +9,7 @@ from policy_2_3_cores import Policy2And3Cores
 from job import JobInfo
 from policy import Policy
 import logging
-
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -90,18 +90,25 @@ def set_memcached_cpu_affinity(pid: int, cores: str):
 
 def main(policy: Policy):
     # log to a file (scheduler_04052025_17h36.log) with epoch time
-    logging.basicConfig(level=logging.INFO, format=f"{time.time()} -- %(message)s", filename=f"scheduler_{time.strftime('%d%m%Y_%H%M')}.log")
+    logging.basicConfig(
+        level=logging.INFO, 
+        format=f"[{time.time()}] [{policy.policy_name}] [%(name)s] %(message)s", 
+        handlers=[
+            logging.FileHandler(f"scheduler_{time.strftime('%d%m%Y_%H%M')}.log"),
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
 
-    memcached_pid = get_memcached_pid()
-    logger.info(f"Memcached PID: {memcached_pid}")
-    memcached_target_cores = 1
-    set_memcached_cpu_affinity(memcached_pid, "0")
-    logger.info(f"Memcached CPU affinity set to 0")
+    #memcached_pid = get_memcached_pid()
+    #logger.info(f"Memcached PID: {memcached_pid}")
+    memcached_target_cores = 0
+    #set_memcached_cpu_affinity(memcached_pid, "0")
+    #logger.info(f"Memcached CPU affinity set to 0")
 
     for job in jobs:
         policy.add_job(jobs[job])
 
-    logger.info("Starting scheduler")
+    logger.info(f"Starting scheduler with policy: {policy.policy_name}")
 
     start_time = time.time()
 
@@ -124,6 +131,8 @@ def main(policy: Policy):
 
         if policy.isCompleted:
             break
+    
+        time.sleep(1)
 
 
     end_time = time.time()
@@ -131,7 +140,7 @@ def main(policy: Policy):
 
 
 if __name__ == "__main__":
-
+    
     # Initialize policies
     policy1 = Policy1And2Cores()
     policy2 = Policy2And3Cores()

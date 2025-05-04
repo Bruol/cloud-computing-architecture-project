@@ -20,6 +20,7 @@ class Policy1And2Cores(Policy):
         self.running_one_core: Optional[JobInstance] = None
         self.running_two_core: Optional[JobInstance] = None
         self.isCompleted = False
+        self.policy_name = "1_2_cores"
 
     def add_job(self, job: JobInfo):
         """Add a job to the appropriate queue based on its paralellizability."""
@@ -110,17 +111,17 @@ class Policy1And2Cores(Policy):
     def _check_completed_jobs(self):
         """Check for completed jobs and update running jobs accordingly."""
         if self.running_one_core:
-            if self.running_one_core.check_job_completed() == JobStatus.COMPLETED:
-                logger.info(f"1-core job {self.running_one_core._jobName} completed")
+            status = self.running_one_core.check_job_completed()
+            if status == JobStatus.COMPLETED:
                 self.running_one_core = None
-            elif self.running_one_core.check_job_completed() == JobStatus.ERROR:
+            elif status == JobStatus.ERROR:
                 self.one_core_queue.append(self.running_one_core)
                 self.running_one_core = None
 
         if self.running_two_core:
-            if self.running_two_core.check_job_completed() == JobStatus.COMPLETED:
-                logger.info(f"2-core job {self.running_two_core._jobName} completed")
+            status = self.running_two_core.check_job_completed()
+            if status == JobStatus.COMPLETED:
                 self.running_two_core = None
-            elif self.running_two_core.check_job_completed() == JobStatus.ERROR:
+            elif status == JobStatus.ERROR:
                 self.two_core_queue.append(self.running_two_core)
                 self.running_two_core = None
