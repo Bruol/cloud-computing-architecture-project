@@ -3,20 +3,20 @@ all:
     memcached_servers:
       hosts:
         memcache-server:
-          ansible_host: 35.205.69.102 # external IP of memcache-server
+          ansible_host: 23.251.130.248 # external IP of memcache-server
           internal_ip: 10.0.16.6 # internal IP of memcache-server
-          memcached_threads: 1
+          memcached_threads: 2
     client_agents:
       hosts:
         client-agent:
-          ansible_host: 35.205.246.153 # external IP of client-agent
+          ansible_host: 334.22.228.64 # external IP of client-agent
           internal_ip: 10.0.16.3 # internal IP of client-agent
     client_measures:
       hosts:
         client-measure:
-          ansible_host: 34.38.3.217 # external IP of client-measure
+          ansible_host: 34.76.128.209 # external IP of client-measure
           internal_ip: 10.0.16.4 # internal IP of client-measure
   vars: # replace with the command you want to run
-    mcperf_command: "./mcperf -s {{ memcached_server_ip }} -a {{ agent_server_ip }} --noload -T 8 -C 8 -D 4 -Q 1000 -c 8 -t 5 --scan 5000:220000:5000"
+    mcperf_command: "./mcperf -s {{ memcached_server_ip }} -a {{ agent_server_ip }} --noload -T 8 -C 8 -D 4 -Q 1000 -c 8 -t 1800 --qps_interval 10 --qps_min 5000 --qps_max 180000 | tee mcperf_output_$(date +%Y%m%d_%H%M%S).txt"
     ansible_user: ubuntu
     ansible_ssh_private_key_file: ~/.ssh/cloud-computing

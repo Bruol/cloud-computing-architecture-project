@@ -117,30 +117,38 @@
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
 
-- name: Install cpuUsageMeasurer
+- name: Install scheduler
   hosts: memcached_servers
   become: true
   tasks:
-    - name: Install cpuUsageMeasurer
+    # - name: Install cpuUsageMeasurer
+    #   ansible.builtin.copy:
+    #     src: cpuUsageMeasurer.py
+    #     dest: /home/{{ ansible_user }}/cpuUsageMeasurer.py
+    #     mode: "0755"
+    #     owner: "{{ ansible_user }}"
+    #     group: "{{ ansible_user }}"
+    # - name: Copy requirements.txt
+    #   ansible.builtin.copy:
+    #     src: requirements.txt
+    #     dest: /home/{{ ansible_user }}/requirements.txt
+    - name: Copy scheduler
       ansible.builtin.copy:
-        src: cpuUsageMeasurer.py
-        dest: /home/{{ ansible_user }}/cpuUsageMeasurer.py
+        src: scheduler/
+        dest: /home/{{ ansible_user }}/scheduler/
         mode: "0755"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
-    - name: Copy requirements.txt
-      ansible.builtin.copy:
-        src: requirements.txt
-        dest: /home/{{ ansible_user }}/requirements.txt
     - name: Create virtual environment
       ansible.builtin.command: python3 -m venv venv
       args:
-        chdir: /home/{{ ansible_user }}
+        chdir: /home/{{ ansible_user }}/scheduler
       become: true
       become_user: "{{ ansible_user }}"
-    - name: install dependencies
-      ansible.builtin.command: /home/{{ ansible_user }}/venv/bin/pip install -r /home/{{ ansible_user }}/requirements.txt
-      args:
-        chdir: /home/{{ ansible_user }}
+    - name: Install dependencies
+      ansible.builtin.pip:
+        requirements: /home/{{ ansible_user }}/scheduler/requirements.txt
+        state: present
+        virtualenv: /home/{{ ansible_user }}/scheduler/venv
       become: true
       become_user: "{{ ansible_user }}"
