@@ -52,8 +52,16 @@ class Policy2And3Cores(Policy):
             if len(self.two_core_queue) == 0 and len(self.three_core_queue) == 0:
                 if self.running_two_core is None and self.running_three_core and self.running_three_core._status != JobStatus.COMPLETED:
                     self.running_three_core.update_job_cpus(f"{sorted_cores[0]},{sorted_cores[1]}")
+                    try:
+                        self.running_three_core.unpause_job()
+                    except Exception as e:
+                        logger.warning(f"Error unpausing 3-core job: {e}")
                 elif self.running_three_core is None and self.running_two_core and self.running_two_core._status != JobStatus.COMPLETED:
                     self.running_two_core.update_job_cpus(f"{sorted_cores[0]},{sorted_cores[1]}")
+                    try:
+                        self.running_two_core.unpause_job()
+                    except Exception as e:
+                        logger.warning(f"Error unpausing 2-core job: {e}")
                 return
 
             # Pause running 3-core job if exists
@@ -77,8 +85,16 @@ class Policy2And3Cores(Policy):
             if len(self.two_core_queue) == 0 and len(self.three_core_queue) == 0:
                 if self.running_two_core is None and self.running_three_core and self.running_three_core._status != JobStatus.COMPLETED:
                     self.running_three_core.update_job_cpus(f"{sorted_cores[0]},{sorted_cores[1]},{sorted_cores[2]}")
+                    try:
+                        self.running_three_core.unpause_job()
+                    except Exception as e:
+                        logger.warning(f"Error unpausing 3-core job: {e}")
                 elif self.running_three_core is None and self.running_two_core and self.running_two_core._status != JobStatus.COMPLETED:
                     self.running_two_core.update_job_cpus(f"{sorted_cores[0]},{sorted_cores[1]},{sorted_cores[2]}")
+                    try:
+                        self.running_two_core.unpause_job()
+                    except Exception as e:
+                        logger.warning(f"Error unpausing 2-core job: {e}")
                 return
 
             # Pause running 2-core job if exists
