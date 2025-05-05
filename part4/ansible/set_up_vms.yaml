@@ -121,46 +121,51 @@
         dest: /home/{{ ansible_user }}/memcache-perf-dynamic/run_load.sh
         content: |
           #!/bin/bash
-          cd /home/{{ ansible_user }}/memcache-perf-dynamic
-          ./mcperf -s {{ memcached_server_ip }} --loadonly
-          {{ mcperf_command | default('./mcperf -s ' + memcached_server_ip + ' -a ' + agent_server_ip + ' --noload -T 8 -C 8 -D 4 -Q 1000 -c 8 -t 10 \
-            --qps_interval 2 --qps_min 5000 --qps_max 180000') }}
-        mode: "0755"
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
+          if [ -z "$1" ]; then
+            echo "Usage: $0 <logfile>"
+            exit 1
+          fi
 
-- name: Install scheduler
-  hosts: memcached_servers
-  become: true
-  tasks:
-    # - name: Install cpuUsageMeasurer
-    #   ansible.builtin.copy:
-    #     src: cpuUsageMeasurer.py
-    #     dest: /home/{{ ansible_user }}/cpuUsageMeasurer.py
-    #     mode: "0755"
-    #     owner: "{{ ansible_user }}"
-    #     group: "{{ ansible_user }}"
-    # - name: Copy requirements.txt
-    #   ansible.builtin.copy:
-    #     src: requirements.txt
-    #     dest: /home/{{ ansible_user }}/requirements.txt
-    - name: Copy scheduler
-      ansible.builtin.copy:
-        src: ../scheduler/
-        dest: /home/{{ ansible_user }}/scheduler/
+          LOGFILE="$1"
+          cd /home/{{ ansible_user }}/memcache-perf-dynamic
+          ./mcperf -s {{ memcached_server_ip }} --loadonly 
+          {{ mcperf_command | default('./mcperf -s ' + memcached_server_ip + ' -a ' + agent_server_ip + ' --noload -T 8 -C 8 -D 4 -Q 1000 -c 8 -t 10 \
+            --qps_interval 2 --qps_min 5000 --qps_max 180000') }} >> $LOGFILE 2>&1
         mode: "0755"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
-    - name: Create virtual environment
-      ansible.builtin.command: python3 -m venv venv
-      args:
-        chdir: /home/{{ ansible_user }}/scheduler
-      become: true
-      become_user: "{{ ansible_user }}"
-    - name: Install dependencies
-      ansible.builtin.pip:
-        requirements: /home/{{ ansible_user }}/scheduler/requirements.txt
-        state: present
-        virtualenv: /home/{{ ansible_user }}/scheduler/venv
-      become: true
-      become_user: "{{ ansible_user }}"
+# - name: Install scheduler
+#   hosts: memcached_servers
+#   become: true
+#   tasks:
+#     # - name: Install cpuUsageMeasurer
+#     #   ansible.builtin.copy:
+#     #     src: cpuUsageMeasurer.py
+#     #     dest: /home/{{ ansible_user }}/cpuUsageMeasurer.py
+#     #     mode: "0755"
+#     #     owner: "{{ ansible_user }}"
+#     #     group: "{{ ansible_user }}"
+#     # - name: Copy requirements.txt
+#     #   ansible.builtin.copy:
+#     #     src: requirements.txt
+#     #     dest: /home/{{ ansible_user }}/requirements.txt
+#     - name: Copy scheduler
+#       ansible.builtin.copy:
+#         src: ../scheduler/
+#         dest: /home/{{ ansible_user }}/scheduler/
+#         mode: "0755"
+#         owner: "{{ ansible_user }}"
+#         group: "{{ ansible_user }}"
+#     - name: Create virtual environment
+#       ansible.builtin.command: python3 -m venv venv
+#       args:
+#         chdir: /home/{{ ansible_user }}/scheduler
+#       become: true
+#       become_user: "{{ ansible_user }}"
+#     - name: Install dependencies
+#       ansible.builtin.pip:
+#         requirements: /home/{{ ansible_user }}/scheduler/requirements.txt
+#         state: present
+#         virtualenv: /home/{{ ansible_user }}/scheduler/venv
+#       become: true
+#       become_user: "{{ ansible_user }}"

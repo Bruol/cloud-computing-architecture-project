@@ -54,8 +54,16 @@ class Policy1And2Cores(Policy):
             if len(self.one_core_queue) == 0 and len(self.two_core_queue) == 0:
                 if self.running_one_core is None and self.running_two_core and self.running_two_core._status != JobStatus.COMPLETED:
                     self.running_two_core.update_job_cpus(f"{sorted_cores[0]},{sorted_cores[1]},{sorted_cores[2]}")
+                    try:
+                        self.running_two_core.unpause_job()
+                    except Exception as e:
+                        logger.warning(f"Error unpausing 2-core job: {e}")
                 elif self.running_one_core and self.running_two_core is None and self.running_one_core._status != JobStatus.COMPLETED:
                     self.running_one_core.update_job_cpus(f"{sorted_cores[0]},{sorted_cores[1]},{sorted_cores[2]}")
+                    try:
+                        self.running_one_core.unpause_job()
+                    except Exception as e:
+                        logger.warning(f"Error unpausing 1-core job: {e}")
                 return
 
             # Start/continue 2-core job
@@ -88,8 +96,16 @@ class Policy1And2Cores(Policy):
             if len(self.one_core_queue) == 0 and len(self.two_core_queue) == 0:
                 if self.running_one_core is None and self.running_two_core and self.running_two_core._status != JobStatus.COMPLETED:
                     self.running_two_core.update_job_cpus(f"{sorted_cores[0]},{sorted_cores[1]}")
+                    try:
+                        self.running_two_core.unpause_job()
+                    except Exception as e:
+                        logger.warning(f"Error unpausing 2-core job: {e}")
                 elif self.running_two_core is None and self.running_one_core and self.running_one_core._status != JobStatus.COMPLETED:
                     self.running_one_core.update_job_cpus(f"{sorted_cores[0]},{sorted_cores[1]}")
+                    try:
+                        self.running_one_core.unpause_job()
+                    except Exception as e:
+                        logger.warning(f"Error unpausing 1-core job: {e}")
                 return 
 
             # Pause running 1-core job if exists

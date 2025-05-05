@@ -88,11 +88,15 @@ def main():
     """Main function to run all experiments."""
     # Number of runs per policy
     NUM_RUNS = 3
+
     
     # Run each policy multiple times
     for policy_name, policy_value in POLICIES.items():
         print(f"\n=== Starting experiments for {policy_name} ===")
         for run in range(NUM_RUNS):
+            if os.path.exists(f"part4_2_logs/scheduler_policy{policy_value}_run{run + 1}.log"):
+                print(f"[{datetime.now()}] Experiment {policy_name} run {run + 1} already exists. Skipping...")
+                continue
             run_experiment(policy_value, run + 1)
             # Wait between runs
             if run < NUM_RUNS - 1:
