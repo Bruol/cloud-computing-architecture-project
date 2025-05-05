@@ -13,6 +13,7 @@
           - memcached
           - libmemcached-tools
           - python3.12-venv
+          - docker.io
         state: present
 
     - name: Check memcached status
@@ -32,6 +33,10 @@
         - { regexp: '^-t \d+', line: "-t {{ memcached_threads | default(1) }}" }
       notify:
         - Restart memcached
+    - name: Add ansible user to docker group
+      ansible.builtin.command: usermod -aG docker {{ ansible_user }}
+      become: true
+      become_user: "root"
 
   handlers:
     - name: Restart memcached
@@ -88,8 +93,15 @@
   hosts: client_agents
   become: true
   tasks:
+    - name: Copy mcperf_agent.sh
+      ansible.builtin.copy:
+        src: mcperf_agent.sh
+        dest: /home/{{ ansible_user }}/memcache-perf-dynamic/mcperf_agent.sh
+        mode: "0755"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
     - name: Start mcperf agent with 8 threads
-      ansible.builtin.command: ./mcperf -T 8 -A
+      ansible.builtin.command: ./mcperf_agent.sh
       args:
         chdir: /home/{{ ansible_user }}/memcache-perf-dynamic
       async: 315360000 # Run for a long time (10 years)
@@ -134,7 +146,7 @@
     #     dest: /home/{{ ansible_user }}/requirements.txt
     - name: Copy scheduler
       ansible.builtin.copy:
-        src: scheduler/
+        src: ../scheduler/
         dest: /home/{{ ansible_user }}/scheduler/
         mode: "0755"
         owner: "{{ ansible_user }}"
