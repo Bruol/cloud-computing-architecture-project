@@ -61,7 +61,6 @@ class JobInstance:
         self._container = None
         self._status = JobStatus.PENDING
         self._docker_client = docker_client
-        self._cores = None
         self._error_count = 0
         self._threads = threads
         self._start_time = None
@@ -114,10 +113,9 @@ class JobInstance:
         )
 
 
-        logger.info(f"Job {self._jobName} started")        
+        logger.info(f"Job {self._jobName} started with cores {cores} and {self._threads} threads")        
         self._container = container
         self._status = JobStatus.RUNNING
-        self._cores = cores
         self._start_time = time.time()
 
 
@@ -144,9 +142,8 @@ class JobInstance:
         # update the cpu affinity of the job
         if self._container is None:
             raise ValueError(f"Job {self._jobName} is not running")
-        self._container.update_config(cpuset_cpus=cores)
-        self._cores = cores
-        logger.info(f"Job {self._jobName} updated to {cores} cores")
+        self._container.update(cpuset_cpus=cores)
+        logger.info(f"Job {self._jobName} updated to cores {cores}")
 
     
     # TODO: test this
@@ -169,9 +166,7 @@ class JobInstance:
             self._error_count += 1
             self._container.remove()
             self._container = None
-        elif self._container is not None:
-            self._status = JobStatus.RUNNING
-        else:
+        elif self._container is None:
             self._status = JobStatus.PENDING
         
         if self._status == JobStatus.ERROR:

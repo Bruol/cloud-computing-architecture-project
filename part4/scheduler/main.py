@@ -29,9 +29,12 @@ class ColoredFormatter(logging.Formatter):
         return super().format(record)
 
 logger = logging.getLogger(__name__)
-
-CPU_LOW = 75
-CPU_HIGH = 140
+# CPU usage in percent for when to assign more cores to memcached
+CPU_LOW = 70
+# CPU usage in percent for when to assign less cores to memcached
+CPU_HIGH = 100
+# Number of consecutive samples below CPU_HIGH for which to switch back to 1 core
+CPU_HIGH_THRESHOLD = 2
 
 jobs: Dict[str, JobInfo] = {
     "blackscholes": {
@@ -88,7 +91,7 @@ def get_memcached_pid():
 def set_memcached_cpu_affinity(pid: int, cores: str):
     # set the cpu affinity of the memcached process
     # taskset -a -p <pid> -c <cores>
-    subprocess.run(["taskset", "-a", "-p", str(pid), "-c", cores])
+    logger.info(subprocess.run(["sudo", "taskset", "-a", "-cp", cores, str(pid)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
         
 
 # create two policies. 
@@ -105,26 +108,35 @@ def set_memcached_cpu_affinity(pid: int, cores: str):
 
 
 
-def main(policy: Policy):
+def main(policy: Policy, logfile: str | None):
     # log to a file (scheduler_04052025_17h36.log) with epoch time
-    formatter = ColoredFormatter(f"[{time.time()}] [policy: {policy.policy_name}] [%(levelname)s] [%(name)s] %(message)s")
-    
-    # File handler without colors
-    file_handler = logging.FileHandler(f"scheduler_{time.strftime('%d%m%Y_%H%M')}.log")
-    file_handler.setFormatter(logging.Formatter(f"[{time.time()}] [policy: {policy.policy_name}] [%(levelname)s] [%(name)s] %(message)s"))
+    formatter = ColoredFormatter(f"[%(created)d] [policy: {policy.policy_name}] [%(levelname)s] [%(name)s] %(message)s")
     
     # Console handler with colors
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
     
-    logging.basicConfig(
-        level=logging.INFO,
-        handlers=[file_handler, console_handler]
-    )
+    if not logfile is None:
+        # File handler without colors
+        file_handler = logging.FileHandler(logfile)
+        file_handler.setFormatter(formatter) 
+        logging.basicConfig(
+            level=logging.INFO,
+            handlers=[file_handler, console_handler]
+        )
+    else:
+        logging.basicConfig(
+            level=logging.INFO,
+            handlers=[console_handler]
+        )
+
+    logger.info(f"CPU_LOW: {CPU_LOW}")
+    logger.info(f"CPU_HIGH: {CPU_HIGH}")
+    logger.info(f"CPU_HIGH_THRESHOLD: {CPU_HIGH_THRESHOLD}")
 
     memcached_pid = get_memcached_pid()
     logger.info(f"Memcached PID: {memcached_pid}")
-    memcached_target_cores = 0
+    memcached_target_cores = 1
     set_memcached_cpu_affinity(memcached_pid, "0")
     logger.info(f"Memcached CPU affinity set to 0")
 
@@ -135,22 +147,39 @@ def main(policy: Policy):
 
     start_time = time.time()
 
+    # store the last 10 cpu usage samples
+    cpu_usage_samples = []
+
     while True:
         cpu_usage = psutil.cpu_percent(interval=1, percpu=True)
+        cpu_usage_samples.append(cpu_usage)
+
+        if len(cpu_usage_samples) > 10:
+            cpu_usage_samples.pop(0)
 
         logger.info(f"CPU usage: {cpu_usage}")
 
+        old_memcached_target_cores = memcached_target_cores
+        
+        # Respond quickly to high CPU usage by checking current sample
         if memcached_target_cores == 1 and cpu_usage[0] > CPU_LOW:
             memcached_target_cores = 2
-        elif memcached_target_cores == 2 and cpu_usage[0] + cpu_usage[1] < CPU_HIGH:
+        # Respond slowly to low CPU usage by requiring multiple low samples
+        elif memcached_target_cores == 2 and all((sample[0] + sample[1]) < CPU_HIGH for sample in cpu_usage_samples[-CPU_HIGH_THRESHOLD:]):
+            # Only scale down if we see consistently low usage across last 5 samples
             memcached_target_cores = 1
-       
 
-        available_cores = set(range(len(cpu_usage)))-set(range(memcached_target_cores))
+        memcached_cores = range(memcached_target_cores)
+
+        available_cores = set(range(len(cpu_usage)))-set(memcached_cores)
         
-        logger.info(f"Available cores: {available_cores}")
+        logger.info(f"Cores available for jobs: {available_cores}")
 
+        
         policy.schedule(available_cores)
+        
+        if old_memcached_target_cores != memcached_target_cores:
+            set_memcached_cpu_affinity(memcached_pid, ",".join(map(str, memcached_cores)))
 
         if policy.isCompleted:
             break
@@ -164,10 +193,23 @@ def main(policy: Policy):
 
 if __name__ == "__main__":
     
-    # Initialize policies
-    policy1 = Policy1And2Cores()
-    policy2 = Policy2And3Cores()
+    # read policy from command line with -p flag
+    policy = None
+    if "-p" in sys.argv:
+        if sys.argv[sys.argv.index("-p") + 1] == "1":
+            policy = Policy1And2Cores()
+        elif sys.argv[sys.argv.index("-p") + 1] == "2":
+            policy = Policy2And3Cores()
+        else:
+            raise ValueError(f"Invalid policy: {sys.argv[sys.argv.index('-p') + 1]}")
+    else:
+        policy = Policy1And2Cores()
+    
+    # read logfile from command line with -l flag
+    if "-l" in sys.argv:
+        logfile = sys.argv[sys.argv.index("-l") + 1]
+    else:
+        logfile = None
 
-    main(policy1)
+    main(policy, logfile)
 
-    main(policy2)
