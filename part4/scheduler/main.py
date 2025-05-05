@@ -122,11 +122,11 @@ def main(policy: Policy):
         handlers=[file_handler, console_handler]
     )
 
-    #memcached_pid = get_memcached_pid()
-    #logger.info(f"Memcached PID: {memcached_pid}")
+    memcached_pid = get_memcached_pid()
+    logger.info(f"Memcached PID: {memcached_pid}")
     memcached_target_cores = 0
-    #set_memcached_cpu_affinity(memcached_pid, "0")
-    #logger.info(f"Memcached CPU affinity set to 0")
+    set_memcached_cpu_affinity(memcached_pid, "0")
+    logger.info(f"Memcached CPU affinity set to 0")
 
     for job in jobs:
         policy.add_job(jobs[job])
