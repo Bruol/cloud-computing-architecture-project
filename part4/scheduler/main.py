@@ -136,12 +136,18 @@ def main(policy: Policy, logfile: str | None):
 
     memcached_pid = get_memcached_pid()
     logger.info(f"Memcached PID: {memcached_pid}")
-    memcached_target_cores = 1
-    set_memcached_cpu_affinity(memcached_pid, "0")
-    logger.info(f"Memcached CPU affinity set to 0")
+    memcached_target_cores = 2
+    set_memcached_cpu_affinity(memcached_pid, "0,1")
+    logger.info(f"Memcached CPU affinity set to 0,1")
 
     for job in jobs:
-        policy.add_job(jobs[job])
+        if job == "radix":
+            # radix cant run with 3 cores
+            temp = jobs[job]
+            temp["paralellizability"] = 1
+            policy.add_job(temp)
+        else:
+            policy.add_job(jobs[job])
 
     logger.info(f"Starting scheduler with policy: {policy.policy_name}")
 
@@ -182,6 +188,7 @@ def main(policy: Policy, logfile: str | None):
             set_memcached_cpu_affinity(memcached_pid, ",".join(map(str, memcached_cores)))
 
         if policy.isCompleted:
+            set_memcached_cpu_affinity(memcached_pid, "0-3")
             break
     
         time.sleep(1)

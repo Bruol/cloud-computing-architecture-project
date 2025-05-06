@@ -3,19 +3,19 @@ all:
     memcached_servers:
       hosts:
         memcache-server:
-          ansible_host: 23.251.130.248 # external IP of memcache-server
-          internal_ip: 10.0.16.6 # internal IP of memcache-server
+          ansible_host: 34.38.120.74 # external IP of memcache-server
+          internal_ip: 10.0.16.5 # internal IP of memcache-server
           memcached_threads: 2
     client_agents:
       hosts:
         client-agent:
-          ansible_host: 34.22.228.64 # external IP of client-agent
+          ansible_host: 34.78.116.253 # external IP of client-agent
           internal_ip: 10.0.16.3 # internal IP of client-agent
     client_measures:
       hosts:
         client-measure:
-          ansible_host: 34.76.128.209 # external IP of client-measure
-          internal_ip: 10.0.16.4 # internal IP of client-measure
+          ansible_host: 35.189.254.115 # external IP of client-measure
+          internal_ip: 10.0.16.6 # internal IP of client-measure
   vars: # replace with the command you want to run
     mcperf_command: "./mcperf -s {{ memcached_server_ip }} -a {{ agent_server_ip }} --noload -T 8 -C 8 -D 4 -Q 1000 -c 8 -t 1300 --qps_interval 10 --qps_min 5000 --qps_max 180000"
     ansible_user: ubuntu
