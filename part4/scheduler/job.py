@@ -88,7 +88,7 @@ class JobInstance:
     def __del__(self):
         self.cleanup()
 
-    # TODO: test this
+
     def start_job(self, cores: str):
         # return the container
         # docker run --cpuset-cpus="0" -d --rm --name parsec anakli/cca:parsec_blackscholes ./run -a run -S parsec -p blackscholes -i native -n 2
@@ -119,7 +119,7 @@ class JobInstance:
         self._start_time = time.time()
 
 
-    # TODO: test this
+
     def pause_job(self):
         # pause the job
         if self._container is None or self._status != JobStatus.RUNNING:
@@ -128,7 +128,7 @@ class JobInstance:
         logger.info(f"Job {self._jobName} paused")
         self._status = JobStatus.PAUSED
     
-    # TODO: test this
+
     def unpause_job(self):
         # unpause the job
         if self._container is None or self._status != JobStatus.PAUSED:
@@ -137,7 +137,6 @@ class JobInstance:
         logger.info(f"Job {self._jobName} unpaused")
         self._status = JobStatus.RUNNING
     
-    # TODO: test this
     def update_job_cpus(self, cores: str):
         # update the cpu affinity of the job
         if self._container is None:
@@ -146,7 +145,7 @@ class JobInstance:
         logger.info(f"Job {self._jobName} updated to cores {cores}")
 
     
-    # TODO: test this
+
     def check_job_completed(self):
         # check if the job is completed
         if self._container is None:

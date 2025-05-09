@@ -82,12 +82,10 @@ jobs: Dict[str, JobInfo] = {
 }
 
 
-# TODO: test this
 def get_memcached_pid():
     # get the pid of the memcached process
     return subprocess.check_output(["pgrep", "-f", "memcached"]).decode("utf-8").strip()
 
-# TODO: test this
 def set_memcached_cpu_affinity(pid: int, cores: str):
     # set the cpu affinity of the memcached process
     # taskset -a -p <pid> -c <cores>
