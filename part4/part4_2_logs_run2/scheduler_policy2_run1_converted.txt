@@ -1,0 +1,590 @@
+2025-05-06T13:53:34 start scheduler
+2025-05-06T13:53:42 start ferret [1,2,3] 3
+2025-05-06T13:53:44 pause ferret
+2025-05-06T13:53:58 start blackscholes [2,3] 2
+2025-05-06T13:54:02 pause blackscholes
+2025-05-06T13:54:02 unpause ferret
+2025-05-06T13:54:12 pause ferret
+2025-05-06T13:54:12 unpause blackscholes
+2025-05-06T13:54:16 pause blackscholes
+2025-05-06T13:54:16 unpause ferret
+2025-05-06T13:54:19 pause ferret
+2025-05-06T13:54:19 unpause blackscholes
+2025-05-06T13:54:33 pause blackscholes
+2025-05-06T13:54:33 unpause ferret
+2025-05-06T13:54:50 pause ferret
+2025-05-06T13:54:50 unpause blackscholes
+2025-05-06T13:55:02 pause blackscholes
+2025-05-06T13:55:02 unpause ferret
+2025-05-06T13:55:21 pause ferret
+2025-05-06T13:55:21 unpause blackscholes
+2025-05-06T13:55:25 pause blackscholes
+2025-05-06T13:55:25 unpause ferret
+2025-05-06T13:55:27 pause ferret
+2025-05-06T13:55:27 unpause blackscholes
+2025-05-06T13:55:44 pause blackscholes
+2025-05-06T13:55:44 unpause ferret
+2025-05-06T13:55:46 pause ferret
+2025-05-06T13:55:46 unpause blackscholes
+2025-05-06T13:56:03 pause blackscholes
+2025-05-06T13:56:03 unpause ferret
+2025-05-06T13:56:11 pause ferret
+2025-05-06T13:56:11 unpause blackscholes
+2025-05-06T13:56:15 end blackscholes
+2025-05-06T13:56:15 unpause ferret
+2025-05-06T13:56:17 pause ferret
+2025-05-06T13:56:21 start canneal [2,3] 2
+2025-05-06T13:56:32 pause canneal
+2025-05-06T13:56:32 unpause ferret
+2025-05-06T13:56:40 pause ferret
+2025-05-06T13:56:40 unpause canneal
+2025-05-06T13:56:44 pause canneal
+2025-05-06T13:56:44 unpause ferret
+2025-05-06T13:56:46 pause ferret
+2025-05-06T13:56:46 unpause canneal
+2025-05-06T13:57:03 pause canneal
+2025-05-06T13:57:03 unpause ferret
+2025-05-06T13:57:30 pause ferret
+2025-05-06T13:57:30 unpause canneal
+2025-05-06T13:57:43 pause canneal
+2025-05-06T13:57:43 unpause ferret
+2025-05-06T13:58:10 pause ferret
+2025-05-06T13:58:10 unpause canneal
+2025-05-06T13:58:22 pause canneal
+2025-05-06T13:58:22 unpause ferret
+2025-05-06T13:58:41 pause ferret
+2025-05-06T13:58:41 unpause canneal
+2025-05-06T13:58:54 pause canneal
+2025-05-06T13:58:54 unpause ferret
+2025-05-06T13:58:56 pause ferret
+2025-05-06T13:58:56 unpause canneal
+2025-05-06T13:59:00 pause canneal
+2025-05-06T13:59:00 unpause ferret
+2025-05-06T13:59:14 end ferret
+2025-05-06T13:59:22 start freqmine [1,2,3] 3
+2025-05-06T13:59:24 pause freqmine
+2025-05-06T13:59:24 unpause canneal
+2025-05-06T13:59:32 pause canneal
+2025-05-06T13:59:32 unpause freqmine
+2025-05-06T13:59:45 pause freqmine
+2025-05-06T13:59:45 unpause canneal
+2025-05-06T13:59:49 pause canneal
+2025-05-06T13:59:49 unpause freqmine
+2025-05-06T13:59:51 pause freqmine
+2025-05-06T13:59:51 unpause canneal
+2025-05-06T14:00:13 pause canneal
+2025-05-06T14:00:13 unpause freqmine
+2025-05-06T14:00:21 pause freqmine
+2025-05-06T14:00:21 unpause canneal
+2025-05-06T14:00:25 pause canneal
+2025-05-06T14:00:25 unpause freqmine
+2025-05-06T14:00:27 pause freqmine
+2025-05-06T14:00:27 unpause canneal
+2025-05-06T14:00:31 pause canneal
+2025-05-06T14:00:31 unpause freqmine
+2025-05-06T14:00:41 pause freqmine
+2025-05-06T14:00:41 unpause canneal
+2025-05-06T14:00:52 pause canneal
+2025-05-06T14:00:52 unpause freqmine
+2025-05-06T14:01:02 pause freqmine
+2025-05-06T14:01:02 unpause canneal
+2025-05-06T14:01:06 pause canneal
+2025-05-06T14:01:06 unpause freqmine
+2025-05-06T14:01:08 pause freqmine
+2025-05-06T14:01:08 unpause canneal
+2025-05-06T14:01:12 pause canneal
+2025-05-06T14:01:12 unpause freqmine
+2025-05-06T14:01:30 pause freqmine
+2025-05-06T14:01:30 unpause canneal
+2025-05-06T14:01:34 pause canneal
+2025-05-06T14:01:34 unpause freqmine
+2025-05-06T14:01:36 pause freqmine
+2025-05-06T14:01:36 unpause canneal
+2025-05-06T14:01:52 pause canneal
+2025-05-06T14:01:52 unpause freqmine
+2025-05-06T14:01:55 pause freqmine
+2025-05-06T14:01:55 unpause canneal
+2025-05-06T14:01:59 pause canneal
+2025-05-06T14:01:59 unpause freqmine
+2025-05-06T14:02:01 pause freqmine
+2025-05-06T14:02:01 unpause canneal
+2025-05-06T14:02:23 pause canneal
+2025-05-06T14:02:23 unpause freqmine
+2025-05-06T14:02:31 pause freqmine
+2025-05-06T14:02:31 unpause canneal
+2025-05-06T14:02:39 end canneal
+2025-05-06T14:03:03 start dedup [2,3] 2
+2025-05-06T14:03:13 pause dedup
+2025-05-06T14:03:13 unpause freqmine
+2025-05-06T14:03:29 pause freqmine
+2025-05-06T14:03:29 unpause dedup
+2025-05-06T14:03:42 end dedup
+2025-05-06T14:03:42 start radix [2,3] 3
+2025-05-06T14:03:44 pause radix
+2025-05-06T14:03:44 unpause freqmine
+2025-05-06T14:03:50 pause freqmine
+2025-05-06T14:03:50 unpause radix
+2025-05-06T14:04:02 pause radix
+2025-05-06T14:04:02 unpause freqmine
+2025-05-06T14:04:10 pause freqmine
+2025-05-06T14:04:10 unpause radix
+2025-05-06T14:04:52 pause radix
+2025-05-06T14:04:52 unpause freqmine
+2025-05-06T14:05:21 pause freqmine
+2025-05-06T14:05:21 unpause radix
+2025-05-06T14:05:43 pause radix
+2025-05-06T14:05:43 unpause freqmine
+2025-05-06T14:05:45 pause freqmine
+2025-05-06T14:05:45 unpause radix
+2025-05-06T14:05:49 pause radix
+2025-05-06T14:05:49 unpause freqmine
+2025-05-06T14:05:51 pause freqmine
+2025-05-06T14:05:51 unpause radix
+2025-05-06T14:06:23 pause radix
+2025-05-06T14:06:23 unpause freqmine
+2025-05-06T14:06:25 pause freqmine
+2025-05-06T14:06:25 unpause radix
+2025-05-06T14:06:29 pause radix
+2025-05-06T14:06:29 unpause freqmine
+2025-05-06T14:06:32 pause freqmine
+2025-05-06T14:06:32 unpause radix
+2025-05-06T14:06:50 pause radix
+2025-05-06T14:06:50 unpause freqmine
+2025-05-06T14:06:52 pause freqmine
+2025-05-06T14:06:52 unpause radix
+2025-05-06T14:06:56 pause radix
+2025-05-06T14:06:56 unpause freqmine
+2025-05-06T14:06:58 pause freqmine
+2025-05-06T14:06:58 unpause radix
+2025-05-06T14:07:02 pause radix
+2025-05-06T14:07:02 unpause freqmine
+2025-05-06T14:07:10 pause freqmine
+2025-05-06T14:07:10 unpause radix
+2025-05-06T14:07:14 pause radix
+2025-05-06T14:07:14 unpause freqmine
+2025-05-06T14:07:16 pause freqmine
+2025-05-06T14:07:16 unpause radix
+2025-05-06T14:07:20 pause radix
+2025-05-06T14:07:20 unpause freqmine
+2025-05-06T14:07:51 pause freqmine
+2025-05-06T14:07:51 unpause radix
+2025-05-06T14:08:03 pause radix
+2025-05-06T14:08:03 unpause freqmine
+2025-05-06T14:08:07 end freqmine
+2025-05-06T14:08:52 start vips [1,2,3] 3
+2025-05-06T14:09:47 end vips
+2025-05-06T14:09:47 unpause radix
+2025-05-06T14:09:49 update_cores radix [2,3]
+2025-05-06T14:09:51 update_cores radix [2,3]
+2025-05-06T14:09:53 update_cores radix [1,2,3]
+2025-05-06T14:09:55 update_cores radix [2,3]
+2025-05-06T14:09:57 update_cores radix [1,2,3]
+2025-05-06T14:09:59 update_cores radix [2,3]
+2025-05-06T14:10:01 update_cores radix [2,3]
+2025-05-06T14:10:03 update_cores radix [2,3]
+2025-05-06T14:10:05 update_cores radix [2,3]
+2025-05-06T14:10:07 update_cores radix [2,3]
+2025-05-06T14:10:09 update_cores radix [2,3]
+2025-05-06T14:10:11 update_cores radix [2,3]
+2025-05-06T14:10:14 update_cores radix [1,2,3]
+2025-05-06T14:10:16 update_cores radix [2,3]
+2025-05-06T14:10:18 update_cores radix [1,2,3]
+2025-05-06T14:10:20 update_cores radix [2,3]
+2025-05-06T14:10:22 update_cores radix [2,3]
+2025-05-06T14:10:24 update_cores radix [2,3]
+2025-05-06T14:10:26 update_cores radix [2,3]
+2025-05-06T14:10:28 update_cores radix [2,3]
+2025-05-06T14:10:30 update_cores radix [2,3]
+2025-05-06T14:10:32 update_cores radix [2,3]
+2025-05-06T14:10:34 update_cores radix [2,3]
+2025-05-06T14:10:36 update_cores radix [2,3]
+2025-05-06T14:10:38 update_cores radix [2,3]
+2025-05-06T14:10:40 update_cores radix [2,3]
+2025-05-06T14:10:42 update_cores radix [1,2,3]
+2025-05-06T14:10:44 update_cores radix [1,2,3]
+2025-05-06T14:10:46 update_cores radix [1,2,3]
+2025-05-06T14:10:48 update_cores radix [1,2,3]
+2025-05-06T14:10:50 update_cores radix [1,2,3]
+2025-05-06T14:10:52 update_cores radix [1,2,3]
+2025-05-06T14:10:54 update_cores radix [1,2,3]
+2025-05-06T14:10:56 update_cores radix [1,2,3]
+2025-05-06T14:10:58 update_cores radix [1,2,3]
+2025-05-06T14:11:00 update_cores radix [1,2,3]
+2025-05-06T14:11:02 update_cores radix [1,2,3]
+2025-05-06T14:11:04 update_cores radix [1,2,3]
+2025-05-06T14:11:06 update_cores radix [1,2,3]
+2025-05-06T14:11:08 update_cores radix [1,2,3]
+2025-05-06T14:11:10 update_cores radix [1,2,3]
+2025-05-06T14:11:12 update_cores radix [1,2,3]
+2025-05-06T14:11:14 update_cores radix [1,2,3]
+2025-05-06T14:11:16 update_cores radix [1,2,3]
+2025-05-06T14:11:18 update_cores radix [1,2,3]
+2025-05-06T14:11:20 update_cores radix [1,2,3]
+2025-05-06T14:11:22 update_cores radix [1,2,3]
+2025-05-06T14:11:24 update_cores radix [1,2,3]
+2025-05-06T14:11:27 update_cores radix [1,2,3]
+2025-05-06T14:11:29 update_cores radix [1,2,3]
+2025-05-06T14:11:31 update_cores radix [1,2,3]
+2025-05-06T14:11:33 update_cores radix [1,2,3]
+2025-05-06T14:11:35 update_cores radix [1,2,3]
+2025-05-06T14:11:37 update_cores radix [1,2,3]
+2025-05-06T14:11:39 update_cores radix [1,2,3]
+2025-05-06T14:11:41 update_cores radix [1,2,3]
+2025-05-06T14:11:43 update_cores radix [1,2,3]
+2025-05-06T14:11:45 update_cores radix [1,2,3]
+2025-05-06T14:11:47 update_cores radix [1,2,3]
+2025-05-06T14:11:49 update_cores radix [1,2,3]
+2025-05-06T14:11:51 update_cores radix [2,3]
+2025-05-06T14:11:53 update_cores radix [2,3]
+2025-05-06T14:11:55 update_cores radix [2,3]
+2025-05-06T14:11:57 update_cores radix [2,3]
+2025-05-06T14:11:59 update_cores radix [2,3]
+2025-05-06T14:12:01 update_cores radix [2,3]
+2025-05-06T14:12:03 update_cores radix [2,3]
+2025-05-06T14:12:05 update_cores radix [2,3]
+2025-05-06T14:12:07 update_cores radix [2,3]
+2025-05-06T14:12:09 update_cores radix [2,3]
+2025-05-06T14:12:11 update_cores radix [2,3]
+2025-05-06T14:12:13 update_cores radix [1,2,3]
+2025-05-06T14:12:15 update_cores radix [2,3]
+2025-05-06T14:12:17 update_cores radix [1,2,3]
+2025-05-06T14:12:19 update_cores radix [1,2,3]
+2025-05-06T14:12:21 update_cores radix [1,2,3]
+2025-05-06T14:12:23 update_cores radix [1,2,3]
+2025-05-06T14:12:25 update_cores radix [1,2,3]
+2025-05-06T14:12:27 update_cores radix [1,2,3]
+2025-05-06T14:12:29 update_cores radix [1,2,3]
+2025-05-06T14:12:31 update_cores radix [1,2,3]
+2025-05-06T14:12:33 update_cores radix [1,2,3]
+2025-05-06T14:12:35 update_cores radix [1,2,3]
+2025-05-06T14:12:37 update_cores radix [1,2,3]
+2025-05-06T14:12:39 update_cores radix [1,2,3]
+2025-05-06T14:12:42 update_cores radix [2,3]
+2025-05-06T14:12:44 update_cores radix [1,2,3]
+2025-05-06T14:12:46 update_cores radix [2,3]
+2025-05-06T14:12:48 update_cores radix [1,2,3]
+2025-05-06T14:12:50 update_cores radix [2,3]
+2025-05-06T14:12:52 update_cores radix [2,3]
+2025-05-06T14:12:54 update_cores radix [2,3]
+2025-05-06T14:12:56 update_cores radix [2,3]
+2025-05-06T14:12:58 update_cores radix [2,3]
+2025-05-06T14:13:00 update_cores radix [2,3]
+2025-05-06T14:13:02 update_cores radix [1,2,3]
+2025-05-06T14:13:04 update_cores radix [1,2,3]
+2025-05-06T14:13:06 update_cores radix [1,2,3]
+2025-05-06T14:13:08 update_cores radix [1,2,3]
+2025-05-06T14:13:10 update_cores radix [2,3]
+2025-05-06T14:13:12 update_cores radix [2,3]
+2025-05-06T14:13:14 update_cores radix [2,3]
+2025-05-06T14:13:16 update_cores radix [2,3]
+2025-05-06T14:13:18 update_cores radix [2,3]
+2025-05-06T14:13:20 update_cores radix [2,3]
+2025-05-06T14:13:22 update_cores radix [2,3]
+2025-05-06T14:13:24 update_cores radix [2,3]
+2025-05-06T14:13:26 update_cores radix [2,3]
+2025-05-06T14:13:28 update_cores radix [2,3]
+2025-05-06T14:13:30 update_cores radix [1,2,3]
+2025-05-06T14:13:32 update_cores radix [1,2,3]
+2025-05-06T14:13:34 update_cores radix [1,2,3]
+2025-05-06T14:18:38 start ferret [1,2,3] 3
+2025-05-06T14:19:43 pause ferret
+2025-05-06T14:19:44 start blackscholes [2,3] 2
+2025-05-06T14:20:04 pause blackscholes
+2025-05-06T14:20:04 unpause ferret
+2025-05-06T14:20:13 pause ferret
+2025-05-06T14:20:13 unpause blackscholes
+2025-05-06T14:20:25 pause blackscholes
+2025-05-06T14:20:25 unpause ferret
+2025-05-06T14:20:27 pause ferret
+2025-05-06T14:20:27 unpause blackscholes
+2025-05-06T14:20:32 pause blackscholes
+2025-05-06T14:20:32 unpause ferret
+2025-05-06T14:20:48 pause ferret
+2025-05-06T14:20:48 unpause blackscholes
+2025-05-06T14:20:52 pause blackscholes
+2025-05-06T14:20:52 unpause ferret
+2025-05-06T14:21:05 pause ferret
+2025-05-06T14:21:05 unpause blackscholes
+2025-05-06T14:21:09 pause blackscholes
+2025-05-06T14:21:09 unpause ferret
+2025-05-06T14:21:11 pause ferret
+2025-05-06T14:21:11 unpause blackscholes
+2025-05-06T14:21:16 pause blackscholes
+2025-05-06T14:21:16 unpause ferret
+2025-05-06T14:21:18 pause ferret
+2025-05-06T14:21:18 unpause blackscholes
+2025-05-06T14:21:22 pause blackscholes
+2025-05-06T14:21:22 unpause ferret
+2025-05-06T14:21:53 pause ferret
+2025-05-06T14:21:53 unpause blackscholes
+2025-05-06T14:22:04 pause blackscholes
+2025-05-06T14:22:04 unpause ferret
+2025-05-06T14:22:14 pause ferret
+2025-05-06T14:22:14 unpause blackscholes
+2025-05-06T14:22:18 pause blackscholes
+2025-05-06T14:22:18 unpause ferret
+2025-05-06T14:22:21 pause ferret
+2025-05-06T14:22:21 unpause blackscholes
+2025-05-06T14:22:35 end blackscholes
+2025-05-06T14:22:35 start canneal [2,3] 2
+2025-05-06T14:22:37 pause canneal
+2025-05-06T14:22:37 unpause ferret
+2025-05-06T14:22:39 pause ferret
+2025-05-06T14:22:39 unpause canneal
+2025-05-06T14:22:43 pause canneal
+2025-05-06T14:22:43 unpause ferret
+2025-05-06T14:22:49 end ferret
+2025-05-06T14:22:50 start freqmine [1,2,3] 3
+2025-05-06T14:23:14 pause freqmine
+2025-05-06T14:23:14 unpause canneal
+2025-05-06T14:23:44 pause canneal
+2025-05-06T14:23:44 unpause freqmine
+2025-05-06T14:23:52 pause freqmine
+2025-05-06T14:23:52 unpause canneal
+2025-05-06T14:24:04 pause canneal
+2025-05-06T14:24:04 unpause freqmine
+2025-05-06T14:24:06 pause freqmine
+2025-05-06T14:24:06 unpause canneal
+2025-05-06T14:24:10 pause canneal
+2025-05-06T14:24:10 unpause freqmine
+2025-05-06T14:25:13 pause freqmine
+2025-05-06T14:25:13 unpause canneal
+2025-05-06T14:25:25 pause canneal
+2025-05-06T14:25:25 unpause freqmine
+2025-05-06T14:25:33 pause freqmine
+2025-05-06T14:25:33 unpause canneal
+2025-05-06T14:25:45 pause canneal
+2025-05-06T14:25:45 unpause freqmine
+2025-05-06T14:25:47 pause freqmine
+2025-05-06T14:25:47 unpause canneal
+2025-05-06T14:25:51 pause canneal
+2025-05-06T14:25:52 unpause freqmine
+2025-05-06T14:25:54 pause freqmine
+2025-05-06T14:25:54 unpause canneal
+2025-05-06T14:25:58 pause canneal
+2025-05-06T14:25:58 unpause freqmine
+2025-05-06T14:26:00 pause freqmine
+2025-05-06T14:26:00 unpause canneal
+2025-05-06T14:26:04 pause canneal
+2025-05-06T14:26:04 unpause freqmine
+2025-05-06T14:26:12 pause freqmine
+2025-05-06T14:26:12 unpause canneal
+2025-05-06T14:26:44 pause canneal
+2025-05-06T14:26:44 unpause freqmine
+2025-05-06T14:26:52 pause freqmine
+2025-05-06T14:26:52 unpause canneal
+2025-05-06T14:27:15 pause canneal
+2025-05-06T14:27:15 unpause freqmine
+2025-05-06T14:28:13 pause freqmine
+2025-05-06T14:28:13 unpause canneal
+2025-05-06T14:28:19 pause canneal
+2025-05-06T14:28:19 unpause freqmine
+2025-05-06T14:28:21 pause freqmine
+2025-05-06T14:28:21 unpause canneal
+2025-05-06T14:28:25 pause canneal
+2025-05-06T14:28:25 unpause freqmine
+2025-05-06T14:28:33 pause freqmine
+2025-05-06T14:28:33 unpause canneal
+2025-05-06T14:28:46 pause canneal
+2025-05-06T14:28:46 unpause freqmine
+2025-05-06T14:28:48 pause freqmine
+2025-05-06T14:28:48 unpause canneal
+2025-05-06T14:29:06 pause canneal
+2025-05-06T14:29:06 unpause freqmine
+2025-05-06T14:29:08 end freqmine
+2025-05-06T14:29:08 unpause canneal
+2025-05-06T14:29:10 pause canneal
+2025-05-06T14:29:10 start vips [1,2,3] 3
+2025-05-06T14:29:12 pause vips
+2025-05-06T14:29:12 unpause canneal
+2025-05-06T14:29:16 pause canneal
+2025-05-06T14:29:16 unpause vips
+2025-05-06T14:29:18 pause vips
+2025-05-06T14:29:18 unpause canneal
+2025-05-06T14:29:32 end canneal
+2025-05-06T14:29:32 unpause vips
+2025-05-06T14:29:42 pause vips
+2025-05-06T14:29:44 start dedup [2,3] 2
+2025-05-06T14:30:07 end dedup
+2025-05-06T14:30:07 unpause vips
+2025-05-06T14:30:33 pause vips
+2025-05-06T14:30:36 start radix [2,3] 2
+2025-05-06T14:31:02 end radix
+2025-05-06T14:31:02 unpause vips
+2025-05-06T14:31:04 update_cores vips [1,2,3]
+2025-05-06T14:31:06 update_cores vips [1,2,3]
+2025-05-06T14:31:09 end vips
+2025-05-06T14:31:09 end scheduler
+2025-05-06T16:53:42 start scheduler
+2025-05-06T16:53:43 start ferret [1,2,3] 3
+2025-05-06T16:53:58 pause ferret
+2025-05-06T16:53:58 start blackscholes [2,3] 2
+2025-05-06T16:54:11 pause blackscholes
+2025-05-06T16:54:12 unpause ferret
+2025-05-06T16:54:58 pause ferret
+2025-05-06T16:54:58 unpause blackscholes
+2025-05-06T16:55:02 pause blackscholes
+2025-05-06T16:55:02 unpause ferret
+2025-05-06T16:55:04 pause ferret
+2025-05-06T16:55:04 unpause blackscholes
+2025-05-06T16:55:08 pause blackscholes
+2025-05-06T16:55:08 unpause ferret
+2025-05-06T16:55:48 pause ferret
+2025-05-06T16:55:48 unpause blackscholes
+2025-05-06T16:56:00 pause blackscholes
+2025-05-06T16:56:00 unpause ferret
+2025-05-06T16:56:30 pause ferret
+2025-05-06T16:56:30 unpause blackscholes
+2025-05-06T16:56:34 pause blackscholes
+2025-05-06T16:56:34 unpause ferret
+2025-05-06T16:56:36 pause ferret
+2025-05-06T16:56:36 unpause blackscholes
+2025-05-06T16:57:01 pause blackscholes
+2025-05-06T16:57:01 unpause ferret
+2025-05-06T16:57:07 pause ferret
+2025-05-06T16:57:08 unpause blackscholes
+2025-05-06T16:57:20 pause blackscholes
+2025-05-06T16:57:20 unpause ferret
+2025-05-06T16:57:22 pause ferret
+2025-05-06T16:57:22 unpause blackscholes
+2025-05-06T16:57:26 pause blackscholes
+2025-05-06T16:57:27 unpause ferret
+2025-05-06T16:57:35 pause ferret
+2025-05-06T16:57:35 unpause blackscholes
+2025-05-06T16:57:39 end blackscholes
+2025-05-06T16:57:39 unpause ferret
+2025-05-06T16:57:54 end ferret
+2025-05-06T16:57:54 start freqmine [1,2,3] 3
+2025-05-06T16:57:58 pause freqmine
+2025-05-06T16:58:00 start canneal [2,3] 2
+2025-05-06T16:58:04 pause canneal
+2025-05-06T16:58:04 unpause freqmine
+2025-05-06T16:58:06 pause freqmine
+2025-05-06T16:58:06 unpause canneal
+2025-05-06T16:58:10 pause canneal
+2025-05-06T16:58:10 unpause freqmine
+2025-05-06T16:58:28 pause freqmine
+2025-05-06T16:58:28 unpause canneal
+2025-05-06T16:58:32 pause canneal
+2025-05-06T16:58:33 unpause freqmine
+2025-05-06T16:58:35 pause freqmine
+2025-05-06T16:58:35 unpause canneal
+2025-05-06T16:58:51 pause canneal
+2025-05-06T16:58:51 unpause freqmine
+2025-05-06T16:58:53 pause freqmine
+2025-05-06T16:58:53 unpause canneal
+2025-05-06T16:58:57 pause canneal
+2025-05-06T16:58:57 unpause freqmine
+2025-05-06T16:58:59 pause freqmine
+2025-05-06T16:58:59 unpause canneal
+2025-05-06T16:59:09 pause canneal
+2025-05-06T16:59:09 unpause freqmine
+2025-05-06T16:59:19 pause freqmine
+2025-05-06T16:59:19 unpause canneal
+2025-05-06T16:59:29 pause canneal
+2025-05-06T16:59:29 unpause freqmine
+2025-05-06T16:59:47 pause freqmine
+2025-05-06T16:59:48 unpause canneal
+2025-05-06T17:00:00 pause canneal
+2025-05-06T17:00:00 unpause freqmine
+2025-05-06T17:00:02 pause freqmine
+2025-05-06T17:00:02 unpause canneal
+2025-05-06T17:00:06 pause canneal
+2025-05-06T17:00:06 unpause freqmine
+2025-05-06T17:00:08 pause freqmine
+2025-05-06T17:00:08 unpause canneal
+2025-05-06T17:00:20 pause canneal
+2025-05-06T17:00:20 unpause freqmine
+2025-05-06T17:00:38 pause freqmine
+2025-05-06T17:00:38 unpause canneal
+2025-05-06T17:00:50 pause canneal
+2025-05-06T17:00:50 unpause freqmine
+2025-05-06T17:00:59 pause freqmine
+2025-05-06T17:00:59 unpause canneal
+2025-05-06T17:01:11 pause canneal
+2025-05-06T17:01:11 unpause freqmine
+2025-05-06T17:01:19 pause freqmine
+2025-05-06T17:01:19 unpause canneal
+2025-05-06T17:01:31 pause canneal
+2025-05-06T17:01:31 unpause freqmine
+2025-05-06T17:01:49 pause freqmine
+2025-05-06T17:01:49 unpause canneal
+2025-05-06T17:01:59 pause canneal
+2025-05-06T17:01:59 unpause freqmine
+2025-05-06T17:02:17 pause freqmine
+2025-05-06T17:02:17 unpause canneal
+2025-05-06T17:02:40 pause canneal
+2025-05-06T17:02:40 unpause freqmine
+2025-05-06T17:02:48 pause freqmine
+2025-05-06T17:02:48 unpause canneal
+2025-05-06T17:02:52 pause canneal
+2025-05-06T17:02:52 unpause freqmine
+2025-05-06T17:02:54 pause freqmine
+2025-05-06T17:02:54 unpause canneal
+2025-05-06T17:02:58 pause canneal
+2025-05-06T17:02:58 unpause freqmine
+2025-05-06T17:03:08 pause freqmine
+2025-05-06T17:03:08 unpause canneal
+2025-05-06T17:03:12 pause canneal
+2025-05-06T17:03:12 unpause freqmine
+2025-05-06T17:03:14 pause freqmine
+2025-05-06T17:03:14 unpause canneal
+2025-05-06T17:03:29 pause canneal
+2025-05-06T17:03:29 unpause freqmine
+2025-05-06T17:03:39 pause freqmine
+2025-05-06T17:03:39 unpause canneal
+2025-05-06T17:03:51 pause canneal
+2025-05-06T17:03:51 unpause freqmine
+2025-05-06T17:03:53 pause freqmine
+2025-05-06T17:03:53 unpause canneal
+2025-05-06T17:03:57 pause canneal
+2025-05-06T17:03:57 unpause freqmine
+2025-05-06T17:04:19 pause freqmine
+2025-05-06T17:04:19 unpause canneal
+2025-05-06T17:04:31 pause canneal
+2025-05-06T17:04:31 unpause freqmine
+2025-05-06T17:04:38 pause freqmine
+2025-05-06T17:04:38 unpause canneal
+2025-05-06T17:04:48 end canneal
+2025-05-06T17:04:48 start dedup [2,3] 2
+2025-05-06T17:04:50 pause dedup
+2025-05-06T17:04:50 unpause freqmine
+2025-05-06T17:05:01 end freqmine
+2025-05-06T17:05:01 start vips [1,2,3] 3
+2025-05-06T17:05:03 pause vips
+2025-05-06T17:05:03 unpause dedup
+2025-05-06T17:05:11 pause dedup
+2025-05-06T17:05:11 unpause vips
+2025-05-06T17:05:14 pause vips
+2025-05-06T17:05:15 unpause dedup
+2025-05-06T17:05:30 end dedup
+2025-05-06T17:05:30 start radix [2,3] 2
+2025-05-06T17:06:03 end radix
+2025-05-06T17:06:03 unpause vips
+2025-05-06T17:06:05 update_cores vips [1,2,3]
+2025-05-06T17:06:07 update_cores vips [1,2,3]
+2025-05-06T17:06:09 update_cores vips [2,3]
+2025-05-06T17:06:11 update_cores vips [2,3]
+2025-05-06T17:06:13 update_cores vips [2,3]
+2025-05-06T17:06:15 update_cores vips [2,3]
+2025-05-06T17:06:17 update_cores vips [1,2,3]
+2025-05-06T17:06:19 update_cores vips [2,3]
+2025-05-06T17:06:21 update_cores vips [2,3]
+2025-05-06T17:06:23 update_cores vips [1,2,3]
+2025-05-06T17:06:25 update_cores vips [2,3]
+2025-05-06T17:06:28 update_cores vips [2,3]
+2025-05-06T17:06:30 update_cores vips [2,3]
+2025-05-06T17:06:32 update_cores vips [2,3]
+2025-05-06T17:06:34 update_cores vips [2,3]
+2025-05-06T17:06:36 update_cores vips [2,3]
+2025-05-06T17:06:38 update_cores vips [2,3]
+2025-05-06T17:06:40 update_cores vips [1,2,3]
+2025-05-06T17:06:42 update_cores vips [2,3]
+2025-05-06T17:06:44 update_cores vips [2,3]
+2025-05-06T17:06:46 update_cores vips [1,2,3]
+2025-05-06T17:06:48 update_cores vips [1,2,3]
+2025-05-06T17:06:50 update_cores vips [1,2,3]
+2025-05-06T17:06:53 update_cores vips [1,2,3]
+2025-05-06T17:06:55 update_cores vips [1,2,3]
+2025-05-06T17:06:57 end vips
+2025-05-06T17:06:57 end scheduler
