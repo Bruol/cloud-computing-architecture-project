@@ -110,5 +110,5 @@
 2025-05-06T15:57:54 end radix
 2025-05-06T15:57:54 unpause canneal
 2025-05-06T15:57:56 end canneal
-2025-05-06T15:57:56 update_cores memcached [0]
+2025-05-06T15:57:56 update_cores memcached [0,1,2,3]
 2025-05-06T15:57:56 end scheduler

@@ -181,5 +181,5 @@
 2025-05-06T17:29:11 update_cores freqmine [1,2,3]
 2025-05-06T17:29:13 update_cores freqmine [1,2,3]
 2025-05-06T17:29:15 end freqmine
-2025-05-06T17:29:15 update_cores memcached [0]
+2025-05-06T17:29:15 update_cores memcached [0,1,2,3]
 2025-05-06T17:29:15 end scheduler

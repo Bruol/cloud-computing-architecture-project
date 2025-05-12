@@ -251,5 +251,5 @@
 2025-05-06T17:06:53 update_cores vips [1,2,3]
 2025-05-06T17:06:55 update_cores vips [1,2,3]
 2025-05-06T17:06:57 end vips
-2025-05-06T17:06:57 update_cores memcached [0]
+2025-05-06T17:06:57 update_cores memcached [0,1,2,3]
 2025-05-06T17:06:57 end scheduler

@@ -94,11 +94,15 @@ def parse_line(line):
     elif section == "__main__":
         # Taskset command (memcached core update)
         if "CompletedProcess" in msg:
-            m2 = re.search(r'taskset.*-cp.*?(\d+(?:,\d+)*)', msg)
+            m2 = re.search(r'taskset.*-cp.*?(\d+(?:[,-]\d+)*)', msg)
             if not m2:
                 return None
-            cores = m2.group(1).split(',')
-            print(cores, job_statuses.get('memcached'))
+            cores_str = m2.group(1)
+            if '-' in cores_str:
+                start, end = map(int, cores_str.split('-'))
+                cores = list(map(str, range(start, end + 1)))
+            else:
+                cores = cores_str.split(',')
             if job_statuses.get('memcached') == 'RUNNING':
                 return f"{dt} update_cores memcached [{','.join(cores)}]"
             return None
