@@ -8,6 +8,7 @@ import signal
 import sys
 import time
 import atexit
+from scheduler_logger import SchedulerLogger
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +55,7 @@ class JobManager:
                 logger.error(f"Error cleaning up job {job._jobName}: {str(e)}")
 
 class JobInstance:
-    def __init__(self, jobName: str, image: str, command: list[str], threads: int, docker_client: DockerClient = docker.from_env()):
+    def __init__(self, jobName: str, image: str, command: list[str], threads: int, schedulerLogger: SchedulerLogger, docker_client: DockerClient = docker.from_env()):
         self._jobName = jobName
         self._image = image
         self._command = command
@@ -65,6 +66,7 @@ class JobInstance:
         self._threads = threads
         self._start_time = None
         self._end_time = None
+        self._schedulerLogger = schedulerLogger
         JobManager().register_job(self)
 
     def _handle_interrupt(self, signum, frame):
@@ -114,6 +116,7 @@ class JobInstance:
 
 
         logger.info(f"Job {self._jobName} started with cores {cores} and {self._threads} threads")        
+        self._schedulerLogger.job_start(self._jobName, cores.split(','), self._threads)
         self._container = container
         self._status = JobStatus.RUNNING
         self._start_time = time.time()
@@ -126,6 +129,7 @@ class JobInstance:
             raise ValueError(f"Job {self._jobName} is not running")
         self._container.pause()  
         logger.info(f"Job {self._jobName} paused")
+        self._schedulerLogger.job_pause(self._jobName)
         self._status = JobStatus.PAUSED
     
 
@@ -136,14 +140,15 @@ class JobInstance:
         self._container.unpause()
         logger.info(f"Job {self._jobName} unpaused")
         self._status = JobStatus.RUNNING
-    
+        self._schedulerLogger.job_unpause(self._jobName)
+
     def update_job_cpus(self, cores: str):
         # update the cpu affinity of the job
         if self._container is None:
             raise ValueError(f"Job {self._jobName} is not running")
         self._container.update(cpuset_cpus=cores)
         logger.info(f"Job {self._jobName} updated to cores {cores}")
-
+        self._schedulerLogger.update_cores(self._jobName, cores.split(','))
     
 
     def check_job_completed(self):
@@ -160,6 +165,7 @@ class JobInstance:
             self._status = JobStatus.COMPLETED
             self._end_time = time.time()
             logger.info(f"Job {self._jobName} completed in {self._end_time - self._start_time} seconds")
+            self._schedulerLogger.job_end(self._jobName)
         elif error:
             self._status = JobStatus.ERROR
             self._error_count += 1

@@ -11,6 +11,7 @@ from policy import Policy
 import logging
 import sys
 from colorama import init, Fore, Style
+from scheduler_logger import SchedulerLogger
 
 # Initialize colorama
 init()
@@ -81,6 +82,7 @@ jobs: Dict[str, JobInfo] = {
     },
 }
 
+schedulerLogger = SchedulerLogger()
 
 def get_memcached_pid():
     # get the pid of the memcached process
@@ -132,11 +134,14 @@ def main(policy: Policy, logfile: str | None):
     logger.info(f"CPU_HIGH: {CPU_HIGH}")
     logger.info(f"CPU_HIGH_THRESHOLD: {CPU_HIGH_THRESHOLD}")
 
+    
     memcached_pid = get_memcached_pid()
     logger.info(f"Memcached PID: {memcached_pid}")
     memcached_target_cores = 2
     set_memcached_cpu_affinity(memcached_pid, "0,1")
     logger.info(f"Memcached CPU affinity set to 0,1")
+
+    schedulerLogger.job_start("memcached", "0,1", 2)
 
     for job in jobs:
         if job == "radix":
@@ -150,6 +155,7 @@ def main(policy: Policy, logfile: str | None):
     logger.info(f"Starting scheduler with policy: {policy.policy_name}")
 
     start_time = time.time()
+
 
     # store the last 10 cpu usage samples
     cpu_usage_samples = []
@@ -187,6 +193,7 @@ def main(policy: Policy, logfile: str | None):
 
         if policy.isCompleted:
             set_memcached_cpu_affinity(memcached_pid, "0-3")
+            schedulerLogger.end()
             break
     
         time.sleep(1)
@@ -208,7 +215,7 @@ if __name__ == "__main__":
         else:
             raise ValueError(f"Invalid policy: {sys.argv[sys.argv.index('-p') + 1]}")
     else:
-        policy = Policy1And2Cores()
+        policy = Policy1And2Cores(schedulerLogger)
     
     # read logfile from command line with -l flag
     if "-l" in sys.argv:

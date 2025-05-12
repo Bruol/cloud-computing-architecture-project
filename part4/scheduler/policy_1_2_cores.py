@@ -10,21 +10,24 @@ from job import JobInstance, JobStatus
 import logging
 from job import JobInfo
 from policy import Policy
+from scheduler_logger import SchedulerLogger
 logger = logging.getLogger(__name__)
 
 
+
 class Policy1And2Cores(Policy):
-    def __init__(self):
+    def __init__(self, schedulerLogger: SchedulerLogger):
         self.one_core_queue: List[JobInstance] = []
         self.two_core_queue: List[JobInstance] = []
         self.running_one_core: Optional[JobInstance] = None
         self.running_two_core: Optional[JobInstance] = None
         self.isCompleted = False
         self.policy_name = "1_2_cores"
+        self.schedulerLogger = schedulerLogger
 
     def add_job(self, job: JobInfo):
         """Add a job to the appropriate queue based on its paralellizability."""
-        job_instance = JobInstance(job["name"], job["image"], job["command"], 1 if job["paralellizability"] == 1 else 2)
+        job_instance = JobInstance(job["name"], job["image"], job["command"], 1 if job["paralellizability"] == 1 else 2, self.schedulerLogger)
         if job["paralellizability"] == 1:
             self.one_core_queue.append(job_instance)
         elif job["paralellizability"] == 2:
