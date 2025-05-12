@@ -27,7 +27,7 @@ class Policy1And2Cores(Policy):
 
     def add_job(self, job: JobInfo):
         """Add a job to the appropriate queue based on its paralellizability."""
-        job_instance = JobInstance(job["name"], job["image"], job["command"], 1 if job["paralellizability"] == 1 else 2, self.schedulerLogger)
+        job_instance = JobInstance(job["name"], job["image"], job["command"], 1 if job["paralellizability"] == 1 else 2, self.schedulerLogger, job["logger_job"])
         if job["paralellizability"] == 1:
             self.one_core_queue.append(job_instance)
         elif job["paralellizability"] == 2:

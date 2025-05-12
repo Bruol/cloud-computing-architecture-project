@@ -14,6 +14,7 @@
           - libmemcached-tools
           - python3.12-venv
           - docker.io
+          - screen
         state: present
 
     - name: Check memcached status
@@ -67,6 +68,7 @@
           - git
           - make
           - g++
+          - screen
         state: present
 
     - name: Install memcached build dependencies

@@ -3,11 +3,11 @@ import yaml
 import time
 import os
 from datetime import datetime
-import signal
+
 # Define the policies to test
 POLICIES = {
     "policy1": "1",  # Policy1And2Cores
-    "policy2": "2"   # Policy2And3Cores
+    #"policy2": "2"   # Policy2And3Cores
 }
 
 def run_load(logfileName: str):
@@ -72,6 +72,13 @@ def run_experiment(policy: str, run: int = 1, output_dir: str = "part4_2_logs"):
             "scp",
             "-i", "~/.ssh/cloud-computing",
             f"ubuntu@{inventory['all']['children']['memcached_servers']['hosts']['memcache-server']['ansible_host']}:~/scheduler/{scheduler_log}",
+            output_dir
+        ], check=True)
+
+        subprocess.run([
+            "scp",
+            "-i", "~/.ssh/cloud-computing",
+            f"ubuntu@{inventory['all']['children']['memcached_servers']['hosts']['memcache-server']['ansible_host']}:~/scheduler/log*.txt",
             output_dir
         ], check=True)
 

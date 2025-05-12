@@ -11,7 +11,7 @@ from policy import Policy
 import logging
 import sys
 from colorama import init, Fore, Style
-from scheduler_logger import SchedulerLogger
+from scheduler_logger import SchedulerLogger, Job as JobEnum
 
 # Initialize colorama
 init()
@@ -40,42 +40,49 @@ CPU_HIGH_THRESHOLD = 2
 jobs: Dict[str, JobInfo] = {
     "blackscholes": {
         "name": "blackscholes",
+        "logger_job": JobEnum.BLACKSCHOLES,
         "image": "anakli/cca:parsec_blackscholes",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p blackscholes -i native -n {threads}"],
         "paralellizability": 1,
     },
     "canneal": {
         "name": "canneal",
+        "logger_job": JobEnum.CANNEAL,
         "image": "anakli/cca:parsec_canneal", 
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p canneal -i native -n {threads}"],
         "paralellizability": 1,
     },
     "dedup": {
         "name": "dedup",
+        "logger_job": JobEnum.DEDUP,
         "image": "anakli/cca:parsec_dedup",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p dedup -i native -n {threads}"],
         "paralellizability": 1,
     },
     "ferret": {
         "name": "ferret",
+        "logger_job": JobEnum.FERRET,
         "image": "anakli/cca:parsec_ferret",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p ferret -i native -n {threads}"],
         "paralellizability": 2,
     },
     "freqmine": {
         "name": "freqmine",
+        "logger_job": JobEnum.FREQMINE,
         "image": "anakli/cca:parsec_freqmine",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p freqmine -i native -n {threads}"],
         "paralellizability": 2,
     },
     "radix": {
         "name": "radix",
+        "logger_job": JobEnum.RADIX,
         "image": "anakli/cca:splash2x_radix",
         "command": ["/bin/sh", "-c", "./run -a run -S splash2x -p radix -i native -n {threads}"],
         "paralellizability": 2,
     },
     "vips": {
         "name": "vips",
+        "logger_job": JobEnum.VIPS,
         "image": "anakli/cca:parsec_vips",
         "command": ["/bin/sh", "-c", "./run -a run -S parsec -p vips -i native -n {threads}"],
         "paralellizability": 2,
@@ -141,7 +148,7 @@ def main(policy: Policy, logfile: str | None):
     set_memcached_cpu_affinity(memcached_pid, "0,1")
     logger.info(f"Memcached CPU affinity set to 0,1")
 
-    schedulerLogger.job_start("memcached", "0,1", 2)
+    schedulerLogger.job_start(JobEnum.MEMCACHED, [0,1], 2)
 
     for job in jobs:
         if job == "radix":
@@ -209,9 +216,9 @@ if __name__ == "__main__":
     policy = None
     if "-p" in sys.argv:
         if sys.argv[sys.argv.index("-p") + 1] == "1":
-            policy = Policy1And2Cores()
+            policy = Policy1And2Cores(schedulerLogger)
         elif sys.argv[sys.argv.index("-p") + 1] == "2":
-            policy = Policy2And3Cores()
+            policy = Policy2And3Cores(schedulerLogger)
         else:
             raise ValueError(f"Invalid policy: {sys.argv[sys.argv.index('-p') + 1]}")
     else:
