@@ -91,23 +91,27 @@ def parse_line(line):
                 return f"{dt} update_cores {job_name} [{cores}]"
             return None
 
-    # Scheduler events
-    if section == '__main__':
-        # CPU affinity set (memcached start)
-        m2 = re.match(r'(\w+) CPU affinity set to ([\d,]+)', msg)
-        if m2:
-            job_name = m2.group(1).lower()
-            cores = m2.group(2)
-            if job_name == 'memcached' and job_statuses.get(job_name) != 'RUNNING':
-                job_statuses[job_name] = 'RUNNING'
-                return f"{dt} start {job_name} [{cores}] 2"
+    elif section == "__main__":
+        # Taskset command (memcached core update)
+        if "CompletedProcess" in msg:
+            m2 = re.search(r'taskset.*-cp.*?(\d+(?:,\d+)*)', msg)
+            if not m2:
+                return None
+            cores = m2.group(1).split(',')
+            print(cores, job_statuses.get('memcached'))
+            if job_statuses.get('memcached') == 'RUNNING':
+                return f"{dt} update_cores memcached [{','.join(cores)}]"
             return None
 
-        # Scheduler start (detected by Memcached PID)
-        m2 = re.match(r'Memcached PID: \d+', msg)
-        if m2 and job_statuses.get('scheduler') != 'RUNNING':
+        m2 = re.match(r'CPU_LOW: \d+', msg)
+        if m2:
             job_statuses['scheduler'] = 'RUNNING'
             return f"{dt} start scheduler"
+        
+        # Scheduler start (detected by Memcached PID)
+        if "Memcached PID" in msg:
+            job_statuses['memcached'] = 'RUNNING'
+            return f"{dt} start memcached [0,1] 2"
 
         # Scheduler end
         if 'Scheduler completed' in msg:

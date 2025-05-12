@@ -1,332 +1,235 @@
-2025-05-06T15:12:02 start scheduler
-2025-05-06T15:12:04 start ferret [1,2,3] 3
-2025-05-06T15:12:06 pause ferret
-2025-05-06T15:12:07 start blackscholes [2,3] 2
-2025-05-06T15:12:11 pause blackscholes
-2025-05-06T15:12:11 unpause ferret
-2025-05-06T15:12:13 pause ferret
-2025-05-06T15:12:13 unpause blackscholes
-2025-05-06T15:12:17 pause blackscholes
-2025-05-06T15:12:17 unpause ferret
-2025-05-06T15:12:27 pause ferret
-2025-05-06T15:12:27 unpause blackscholes
-2025-05-06T15:12:50 pause blackscholes
-2025-05-06T15:12:50 unpause ferret
-2025-05-06T15:13:48 pause ferret
-2025-05-06T15:13:48 unpause blackscholes
-2025-05-06T15:14:11 pause blackscholes
-2025-05-06T15:14:11 unpause ferret
-2025-05-06T15:14:17 pause ferret
-2025-05-06T15:14:17 unpause blackscholes
-2025-05-06T15:14:29 pause blackscholes
-2025-05-06T15:14:29 unpause ferret
-2025-05-06T15:14:38 pause ferret
-2025-05-06T15:14:38 unpause blackscholes
-2025-05-06T15:14:57 end blackscholes
-2025-05-06T15:14:57 start canneal [2,3] 2
-2025-05-06T15:15:02 pause canneal
-2025-05-06T15:15:02 unpause ferret
-2025-05-06T15:15:18 pause ferret
-2025-05-06T15:15:18 unpause canneal
-2025-05-06T15:15:22 pause canneal
-2025-05-06T15:15:22 unpause ferret
-2025-05-06T15:15:25 pause ferret
-2025-05-06T15:15:25 unpause canneal
-2025-05-06T15:15:39 pause canneal
-2025-05-06T15:15:39 unpause ferret
-2025-05-06T15:16:29 pause ferret
-2025-05-06T15:16:29 unpause canneal
-2025-05-06T15:16:33 pause canneal
-2025-05-06T15:16:33 unpause ferret
-2025-05-06T15:16:35 pause ferret
-2025-05-06T15:16:35 unpause canneal
-2025-05-06T15:17:11 pause canneal
-2025-05-06T15:17:11 unpause ferret
-2025-05-06T15:17:13 end ferret
-2025-05-06T15:17:13 start freqmine [1,2,3] 3
-2025-05-06T15:17:17 pause freqmine
-2025-05-06T15:17:17 unpause canneal
-2025-05-06T15:17:21 pause canneal
-2025-05-06T15:17:21 unpause freqmine
-2025-05-06T15:17:23 pause freqmine
-2025-05-06T15:17:23 unpause canneal
-2025-05-06T15:17:27 pause canneal
-2025-05-06T15:17:27 unpause freqmine
-2025-05-06T15:17:58 pause freqmine
-2025-05-06T15:17:58 unpause canneal
-2025-05-06T15:18:10 pause canneal
-2025-05-06T15:18:10 unpause freqmine
-2025-05-06T15:18:38 pause freqmine
-2025-05-06T15:18:38 unpause canneal
-2025-05-06T15:19:00 pause canneal
-2025-05-06T15:19:00 unpause freqmine
-2025-05-06T15:19:02 pause freqmine
-2025-05-06T15:19:02 unpause canneal
-2025-05-06T15:19:33 pause canneal
-2025-05-06T15:19:33 unpause freqmine
-2025-05-06T15:19:35 pause freqmine
-2025-05-06T15:19:35 unpause canneal
-2025-05-06T15:19:39 pause canneal
-2025-05-06T15:19:39 unpause freqmine
-2025-05-06T15:19:41 pause freqmine
-2025-05-06T15:19:41 unpause canneal
-2025-05-06T15:19:45 pause canneal
-2025-05-06T15:19:45 unpause freqmine
-2025-05-06T15:19:47 pause freqmine
-2025-05-06T15:19:47 unpause canneal
-2025-05-06T15:19:51 pause canneal
-2025-05-06T15:19:51 unpause freqmine
-2025-05-06T15:19:53 pause freqmine
-2025-05-06T15:19:53 unpause canneal
-2025-05-06T15:19:57 pause canneal
-2025-05-06T15:19:57 unpause freqmine
-2025-05-06T15:20:07 pause freqmine
-2025-05-06T15:20:07 unpause canneal
-2025-05-06T15:20:20 pause canneal
-2025-05-06T15:20:20 unpause freqmine
-2025-05-06T15:20:22 pause freqmine
-2025-05-06T15:20:22 unpause canneal
-2025-05-06T15:20:26 pause canneal
-2025-05-06T15:20:26 unpause freqmine
-2025-05-06T15:20:40 pause freqmine
-2025-05-06T15:20:40 unpause canneal
-2025-05-06T15:20:44 pause canneal
-2025-05-06T15:20:44 unpause freqmine
-2025-05-06T15:20:46 pause freqmine
-2025-05-06T15:20:46 unpause canneal
-2025-05-06T15:20:50 pause canneal
-2025-05-06T15:20:50 unpause freqmine
-2025-05-06T15:20:58 pause freqmine
-2025-05-06T15:20:58 unpause canneal
-2025-05-06T15:21:02 pause canneal
-2025-05-06T15:21:02 unpause freqmine
-2025-05-06T15:21:04 pause freqmine
-2025-05-06T15:21:04 unpause canneal
-2025-05-06T15:21:08 pause canneal
-2025-05-06T15:21:09 unpause freqmine
-2025-05-06T15:21:19 pause freqmine
-2025-05-06T15:21:19 unpause canneal
-2025-05-06T15:21:21 end canneal
-2025-05-06T15:21:21 start dedup [2,3] 2
-2025-05-06T15:21:29 pause dedup
-2025-05-06T15:21:29 unpause freqmine
-2025-05-06T15:21:31 pause freqmine
-2025-05-06T15:21:31 unpause dedup
-2025-05-06T15:21:36 pause dedup
-2025-05-06T15:21:37 unpause freqmine
-2025-05-06T15:21:40 pause freqmine
-2025-05-06T15:21:40 unpause dedup
-2025-05-06T15:21:44 pause dedup
-2025-05-06T15:21:45 unpause freqmine
-2025-05-06T15:21:47 pause freqmine
-2025-05-06T15:21:47 unpause dedup
-2025-05-06T15:21:50 end dedup
-2025-05-06T15:21:50 start radix [2,3] 2
-2025-05-06T15:22:00 pause radix
-2025-05-06T15:22:00 unpause freqmine
-2025-05-06T15:22:08 pause freqmine
-2025-05-06T15:22:08 unpause radix
-2025-05-06T15:22:21 pause radix
-2025-05-06T15:22:21 unpause freqmine
-2025-05-06T15:22:29 pause freqmine
-2025-05-06T15:22:29 unpause radix
-2025-05-06T15:22:39 end radix
-2025-05-06T15:22:39 start vips [2,3] 3
-2025-05-06T15:23:43 end vips
-2025-05-06T15:23:43 unpause freqmine
-2025-05-06T15:23:45 update_cores freqmine [1,2,3]
-2025-05-06T15:23:47 update_cores freqmine [2,3]
-2025-05-06T15:23:49 update_cores freqmine [2,3]
-2025-05-06T15:23:51 update_cores freqmine [1,2,3]
-2025-05-06T15:23:53 update_cores freqmine [2,3]
-2025-05-06T15:23:55 update_cores freqmine [2,3]
-2025-05-06T15:23:57 update_cores freqmine [1,2,3]
-2025-05-06T15:23:59 update_cores freqmine [1,2,3]
-2025-05-06T15:24:01 update_cores freqmine [1,2,3]
-2025-05-06T15:24:03 update_cores freqmine [1,2,3]
-2025-05-06T15:24:05 update_cores freqmine [1,2,3]
-2025-05-06T15:24:07 update_cores freqmine [2,3]
-2025-05-06T15:24:10 update_cores freqmine [2,3]
-2025-05-06T15:24:12 update_cores freqmine [1,2,3]
-2025-05-06T15:24:14 update_cores freqmine [2,3]
-2025-05-06T15:24:16 update_cores freqmine [2,3]
-2025-05-06T15:24:18 update_cores freqmine [1,2,3]
-2025-05-06T15:24:20 update_cores freqmine [2,3]
-2025-05-06T15:24:22 update_cores freqmine [2,3]
-2025-05-06T15:24:24 update_cores freqmine [1,2,3]
-2025-05-06T15:24:26 update_cores freqmine [2,3]
-2025-05-06T15:24:28 update_cores freqmine [2,3]
-2025-05-06T15:24:30 update_cores freqmine [1,2,3]
-2025-05-06T15:24:32 update_cores freqmine [1,2,3]
-2025-05-06T15:24:34 update_cores freqmine [1,2,3]
-2025-05-06T15:24:36 update_cores freqmine [1,2,3]
-2025-05-06T15:24:38 update_cores freqmine [2,3]
-2025-05-06T15:24:40 update_cores freqmine [2,3]
-2025-05-06T15:24:42 update_cores freqmine [2,3]
-2025-05-06T15:24:44 update_cores freqmine [2,3]
-2025-05-06T15:24:46 update_cores freqmine [2,3]
-2025-05-06T15:24:48 update_cores freqmine [2,3]
-2025-05-06T15:24:51 update_cores freqmine [2,3]
-2025-05-06T15:24:53 update_cores freqmine [2,3]
-2025-05-06T15:24:55 update_cores freqmine [2,3]
-2025-05-06T15:24:57 update_cores freqmine [2,3]
-2025-05-06T15:24:59 update_cores freqmine [2,3]
-2025-05-06T15:25:01 end freqmine
-2025-05-06T15:25:01 end scheduler
 2025-05-06T17:39:21 start scheduler
+2025-05-06T17:39:21 start memcached [0,1] 2
+2025-05-06T17:39:21 update_cores memcached [0,1]
 2025-05-06T17:39:22 start ferret [1,2,3] 3
+2025-05-06T17:39:22 update_cores memcached [0]
 2025-05-06T17:40:07 pause ferret
 2025-05-06T17:40:08 start blackscholes [2,3] 2
+2025-05-06T17:40:08 update_cores memcached [0,1]
 2025-05-06T17:40:28 pause blackscholes
 2025-05-06T17:40:28 unpause ferret
+2025-05-06T17:40:28 update_cores memcached [0]
 2025-05-06T17:40:57 pause ferret
 2025-05-06T17:40:57 unpause blackscholes
+2025-05-06T17:40:57 update_cores memcached [0,1]
 2025-05-06T17:41:01 pause blackscholes
 2025-05-06T17:41:01 unpause ferret
+2025-05-06T17:41:02 update_cores memcached [0]
 2025-05-06T17:41:04 pause ferret
 2025-05-06T17:41:04 unpause blackscholes
+2025-05-06T17:41:04 update_cores memcached [0,1]
 2025-05-06T17:41:08 pause blackscholes
 2025-05-06T17:41:08 unpause ferret
+2025-05-06T17:41:08 update_cores memcached [0]
 2025-05-06T17:41:10 pause ferret
 2025-05-06T17:41:10 unpause blackscholes
+2025-05-06T17:41:10 update_cores memcached [0,1]
 2025-05-06T17:41:14 pause blackscholes
 2025-05-06T17:41:14 unpause ferret
+2025-05-06T17:41:14 update_cores memcached [0]
 2025-05-06T17:42:06 pause ferret
 2025-05-06T17:42:06 unpause blackscholes
+2025-05-06T17:42:06 update_cores memcached [0,1]
 2025-05-06T17:42:19 pause blackscholes
 2025-05-06T17:42:19 unpause ferret
+2025-05-06T17:42:19 update_cores memcached [0]
 2025-05-06T17:42:21 pause ferret
 2025-05-06T17:42:21 unpause blackscholes
+2025-05-06T17:42:21 update_cores memcached [0,1]
 2025-05-06T17:42:25 pause blackscholes
 2025-05-06T17:42:25 unpause ferret
+2025-05-06T17:42:25 update_cores memcached [0]
 2025-05-06T17:42:27 pause ferret
 2025-05-06T17:42:27 unpause blackscholes
+2025-05-06T17:42:27 update_cores memcached [0,1]
 2025-05-06T17:42:48 pause blackscholes
 2025-05-06T17:42:48 unpause ferret
+2025-05-06T17:42:48 update_cores memcached [0]
 2025-05-06T17:42:57 pause ferret
 2025-05-06T17:42:57 unpause blackscholes
+2025-05-06T17:42:57 update_cores memcached [0,1]
 2025-05-06T17:43:09 pause blackscholes
 2025-05-06T17:43:09 unpause ferret
+2025-05-06T17:43:09 update_cores memcached [0]
 2025-05-06T17:43:18 pause ferret
 2025-05-06T17:43:18 unpause blackscholes
+2025-05-06T17:43:18 update_cores memcached [0,1]
 2025-05-06T17:43:29 end blackscholes
 2025-05-06T17:43:29 unpause ferret
+2025-05-06T17:43:29 update_cores memcached [0]
 2025-05-06T17:43:40 end ferret
 2025-05-06T17:43:40 start freqmine [1,2,3] 3
 2025-05-06T17:43:46 pause freqmine
 2025-05-06T17:43:48 start canneal [2,3] 2
+2025-05-06T17:43:48 update_cores memcached [0,1]
 2025-05-06T17:44:08 pause canneal
 2025-05-06T17:44:08 unpause freqmine
+2025-05-06T17:44:08 update_cores memcached [0]
 2025-05-06T17:44:18 pause freqmine
 2025-05-06T17:44:18 unpause canneal
+2025-05-06T17:44:18 update_cores memcached [0,1]
 2025-05-06T17:44:22 pause canneal
 2025-05-06T17:44:22 unpause freqmine
+2025-05-06T17:44:22 update_cores memcached [0]
 2025-05-06T17:44:24 pause freqmine
 2025-05-06T17:44:24 unpause canneal
+2025-05-06T17:44:24 update_cores memcached [0,1]
 2025-05-06T17:44:28 pause canneal
 2025-05-06T17:44:28 unpause freqmine
+2025-05-06T17:44:28 update_cores memcached [0]
 2025-05-06T17:44:30 pause freqmine
 2025-05-06T17:44:30 unpause canneal
+2025-05-06T17:44:30 update_cores memcached [0,1]
 2025-05-06T17:44:34 pause canneal
 2025-05-06T17:44:34 unpause freqmine
+2025-05-06T17:44:34 update_cores memcached [0]
 2025-05-06T17:44:36 pause freqmine
 2025-05-06T17:44:36 unpause canneal
+2025-05-06T17:44:36 update_cores memcached [0,1]
 2025-05-06T17:44:59 pause canneal
 2025-05-06T17:44:59 unpause freqmine
+2025-05-06T17:44:59 update_cores memcached [0]
 2025-05-06T17:45:17 pause freqmine
 2025-05-06T17:45:17 unpause canneal
+2025-05-06T17:45:17 update_cores memcached [0,1]
 2025-05-06T17:45:29 pause canneal
 2025-05-06T17:45:29 unpause freqmine
+2025-05-06T17:45:29 update_cores memcached [0]
 2025-05-06T17:45:37 pause freqmine
 2025-05-06T17:45:37 unpause canneal
+2025-05-06T17:45:37 update_cores memcached [0,1]
 2025-05-06T17:45:41 pause canneal
 2025-05-06T17:45:41 unpause freqmine
+2025-05-06T17:45:41 update_cores memcached [0]
 2025-05-06T17:45:43 pause freqmine
 2025-05-06T17:45:43 unpause canneal
+2025-05-06T17:45:43 update_cores memcached [0,1]
 2025-05-06T17:45:47 pause canneal
 2025-05-06T17:45:47 unpause freqmine
+2025-05-06T17:45:47 update_cores memcached [0]
 2025-05-06T17:46:07 pause freqmine
 2025-05-06T17:46:07 unpause canneal
+2025-05-06T17:46:08 update_cores memcached [0,1]
 2025-05-06T17:46:20 pause canneal
 2025-05-06T17:46:20 unpause freqmine
+2025-05-06T17:46:20 update_cores memcached [0]
 2025-05-06T17:46:38 pause freqmine
 2025-05-06T17:46:38 unpause canneal
+2025-05-06T17:46:38 update_cores memcached [0,1]
 2025-05-06T17:46:48 pause canneal
 2025-05-06T17:46:48 unpause freqmine
+2025-05-06T17:46:48 update_cores memcached [0]
 2025-05-06T17:46:50 pause freqmine
 2025-05-06T17:46:50 unpause canneal
+2025-05-06T17:46:50 update_cores memcached [0,1]
 2025-05-06T17:46:54 pause canneal
 2025-05-06T17:46:54 unpause freqmine
+2025-05-06T17:46:54 update_cores memcached [0]
 2025-05-06T17:46:56 pause freqmine
 2025-05-06T17:46:56 unpause canneal
+2025-05-06T17:46:56 update_cores memcached [0,1]
 2025-05-06T17:47:08 pause canneal
 2025-05-06T17:47:08 unpause freqmine
+2025-05-06T17:47:08 update_cores memcached [0]
 2025-05-06T17:47:16 pause freqmine
 2025-05-06T17:47:16 unpause canneal
+2025-05-06T17:47:16 update_cores memcached [0,1]
 2025-05-06T17:47:29 pause canneal
 2025-05-06T17:47:29 unpause freqmine
+2025-05-06T17:47:29 update_cores memcached [0]
 2025-05-06T17:47:37 pause freqmine
 2025-05-06T17:47:37 unpause canneal
+2025-05-06T17:47:37 update_cores memcached [0,1]
 2025-05-06T17:47:49 pause canneal
 2025-05-06T17:47:49 unpause freqmine
+2025-05-06T17:47:49 update_cores memcached [0]
 2025-05-06T17:47:51 pause freqmine
 2025-05-06T17:47:51 unpause canneal
+2025-05-06T17:47:51 update_cores memcached [0,1]
 2025-05-06T17:47:55 pause canneal
 2025-05-06T17:47:55 unpause freqmine
+2025-05-06T17:47:55 update_cores memcached [0]
 2025-05-06T17:47:57 pause freqmine
 2025-05-06T17:47:57 unpause canneal
+2025-05-06T17:47:57 update_cores memcached [0,1]
 2025-05-06T17:48:09 pause canneal
 2025-05-06T17:48:09 unpause freqmine
+2025-05-06T17:48:09 update_cores memcached [0]
 2025-05-06T17:48:11 pause freqmine
 2025-05-06T17:48:11 unpause canneal
+2025-05-06T17:48:11 update_cores memcached [0,1]
 2025-05-06T17:48:15 pause canneal
 2025-05-06T17:48:15 unpause freqmine
+2025-05-06T17:48:15 update_cores memcached [0]
 2025-05-06T17:48:17 pause freqmine
 2025-05-06T17:48:17 unpause canneal
+2025-05-06T17:48:17 update_cores memcached [0,1]
 2025-05-06T17:48:28 pause canneal
 2025-05-06T17:48:28 unpause freqmine
+2025-05-06T17:48:28 update_cores memcached [0]
 2025-05-06T17:48:48 pause freqmine
 2025-05-06T17:48:48 unpause canneal
+2025-05-06T17:48:48 update_cores memcached [0,1]
 2025-05-06T17:49:08 pause canneal
 2025-05-06T17:49:08 unpause freqmine
+2025-05-06T17:49:08 update_cores memcached [0]
 2025-05-06T17:49:16 pause freqmine
 2025-05-06T17:49:16 unpause canneal
+2025-05-06T17:49:16 update_cores memcached [0,1]
 2025-05-06T17:49:26 end canneal
 2025-05-06T17:49:26 start dedup [2,3] 2
 2025-05-06T17:49:28 pause dedup
 2025-05-06T17:49:28 unpause freqmine
+2025-05-06T17:49:28 update_cores memcached [0]
 2025-05-06T17:49:36 pause freqmine
 2025-05-06T17:49:36 unpause dedup
+2025-05-06T17:49:37 update_cores memcached [0,1]
 2025-05-06T17:49:49 pause dedup
 2025-05-06T17:49:49 unpause freqmine
+2025-05-06T17:49:49 update_cores memcached [0]
 2025-05-06T17:49:57 pause freqmine
 2025-05-06T17:49:57 unpause dedup
+2025-05-06T17:49:57 update_cores memcached [0,1]
 2025-05-06T17:50:07 end dedup
 2025-05-06T17:50:07 start radix [2,3] 2
 2025-05-06T17:50:19 pause radix
 2025-05-06T17:50:19 unpause freqmine
+2025-05-06T17:50:19 update_cores memcached [0]
 2025-05-06T17:50:27 pause freqmine
 2025-05-06T17:50:27 unpause radix
+2025-05-06T17:50:27 update_cores memcached [0,1]
 2025-05-06T17:50:39 pause radix
 2025-05-06T17:50:39 unpause freqmine
+2025-05-06T17:50:40 update_cores memcached [0]
 2025-05-06T17:50:50 pause freqmine
 2025-05-06T17:50:50 unpause radix
+2025-05-06T17:50:50 update_cores memcached [0,1]
 2025-05-06T17:50:54 pause radix
 2025-05-06T17:50:54 unpause freqmine
+2025-05-06T17:50:54 update_cores memcached [0]
 2025-05-06T17:50:56 pause freqmine
 2025-05-06T17:50:56 unpause radix
+2025-05-06T17:50:56 update_cores memcached [0,1]
 2025-05-06T17:50:58 end radix
 2025-05-06T17:50:58 start vips [2,3] 3
+2025-05-06T17:51:28 update_cores memcached [0]
+2025-05-06T17:51:36 update_cores memcached [0,1]
+2025-05-06T17:51:48 update_cores memcached [0]
 2025-05-06T17:52:04 end vips
 2025-05-06T17:52:04 unpause freqmine
 2025-05-06T17:52:06 update_cores freqmine [1,2,3]
 2025-05-06T17:52:08 update_cores freqmine [2,3]
+2025-05-06T17:52:08 update_cores memcached [0,1]
 2025-05-06T17:52:10 update_cores freqmine [2,3]
 2025-05-06T17:52:12 update_cores freqmine [1,2,3]
+2025-05-06T17:52:12 update_cores memcached [0]
 2025-05-06T17:52:14 update_cores freqmine [2,3]
+2025-05-06T17:52:14 update_cores memcached [0,1]
 2025-05-06T17:52:16 update_cores freqmine [2,3]
 2025-05-06T17:52:18 update_cores freqmine [1,2,3]
+2025-05-06T17:52:18 update_cores memcached [0]
 2025-05-06T17:52:20 update_cores freqmine [1,2,3]
 2025-05-06T17:52:22 update_cores freqmine [1,2,3]
 2025-05-06T17:52:24 end freqmine
+2025-05-06T17:52:24 update_cores memcached [0]
 2025-05-06T17:52:24 end scheduler
