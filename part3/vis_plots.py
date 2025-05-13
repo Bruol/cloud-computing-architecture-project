@@ -46,6 +46,8 @@ def parse_mcperf_data(file_path):
                 data.append(
                     {
                         "timestamp_ms": ts_mid_ms,
+                        "ts_start_ms": ts_start_ms,
+                        "ts_end_ms": ts_end_ms,
                         "p95_us": p95,  # Store original microseconds
                         "p95_ms": p95 / 1000,  # Convert to milliseconds
                         "qps": qps,
@@ -140,8 +142,9 @@ def process_pods_file(file_path):
 
 
 def create_plots(run_number):
-    mcperf_file = f"part_3_results_group_020/mcperf_{run_number}.txt"
-    pods_file = f"part_3_results_group_020/pods_{run_number}.json"
+    mcperf_file = os.path.abspath(f"part3/part_3_results_group_020/mcperf_{run_number}.txt")
+    pods_file = os.path.abspath(f"part3/part_3_results_group_020/pods_{run_number}.json")
+    
 
     if not os.path.exists(mcperf_file) or not os.path.exists(pods_file):
         print(f"Missing files for run {run_number}. Skipping.")
@@ -161,7 +164,7 @@ def create_plots(run_number):
     )
 
     # Convert timestamps to seconds relative to first job start
-    mcperf_df["timestamp"] = (mcperf_df["timestamp_ms"] - earliest_start_ms) / 1000
+    mcperf_df["timestamp"] = (mcperf_df["ts_start_ms"] - earliest_start_ms) / 1000
     events_df["timestamp"] = (events_df["timestamp_ms"] - earliest_start_ms) / 1000
 
     # Filter to include only data after the first job start (with a margin for visibility)
@@ -174,7 +177,7 @@ def create_plots(run_number):
 
     # Calculate experiment duration
     if not events_df.empty:
-        duration = max(events_df["timestamp"]) + 20  # Add margin at end
+        duration = max(events_df["timestamp"]) + 20
     else:
         duration = max(mcperf_df["timestamp"]) + 20
 
@@ -193,21 +196,25 @@ def create_plots(run_number):
     axA_95p.tick_params(axis="y", labelcolor="tab:blue")
 
     # Set y-axis limits and ticks for latency
-    max_latency = max(3.2, mcperf_df["p95_ms"].max() * 1.1)
+    max_latency = max(1.2, mcperf_df["p95_ms"].max() * 0.1)
     axA_95p.set_ylim([0, max_latency])
     axA_95p.set_yticks(np.arange(0, max_latency + 0.1, 0.4))
 
-    # Plot P95 latency line
-    (artistA_95p,) = axA_95p.plot(
-        mcperf_df["timestamp"],
-        mcperf_df["p95_ms"],
-        "o-",
+    min_start_ms = min(mcperf_df["ts_start_ms"])
+
+    # Plot P95 latency as vertical bars spanning from ts_start to ts_end
+    artistA_95p = axA_95p.bar(
+        (mcperf_df["ts_start_ms"] - min_start_ms) / 1000,  # left edge (start time in seconds)
+        mcperf_df["p95_ms"],  # height (latency value)
+        width=(mcperf_df["ts_end_ms"] - mcperf_df["ts_start_ms"]) / 1000,  # width (duration in seconds)
+        bottom=0,  # start from y=0
         color="tab:blue",
+        alpha=0.7,
+        align="edge",
         label="95 percentile latency",
     )
 
     # Add SLO threshold line (1ms)
-    # axA_95p.axhline(y=1.0, color="red", linestyle="-", linewidth=1.5)
     slo_line = axA_95p.axhline(y=1.0, color="red", linestyle="-", linewidth=1.5)
 
     # Add QPS on secondary y-axis
@@ -215,9 +222,9 @@ def create_plots(run_number):
     axA_QPS.set_ylabel("Queries per second")
 
     # Scale QPS axis appropriately
-    max_qps = max(40000, mcperf_df["qps"].max() * 1.1)
-    axA_QPS.set_ylim([0, max_qps])
-    axA_QPS.set_yticks(np.arange(0, max_qps + 1, 5000))
+    # max_qps = max(40000, mcperf_df["qps"].max() * 1.1)
+    axA_QPS.set_ylim([29000, 31000])
+    axA_QPS.set_yticks(np.arange(29000, 31001, 500))
     axA_QPS.yaxis.set_major_formatter(
         FuncFormatter(lambda x_val, tick_pos: "{:.0f}k".format(x_val / 1000))
     )
@@ -225,13 +232,13 @@ def create_plots(run_number):
     axA_QPS.grid(False)
 
     # Plot QPS points
-    artistA_QPS = axA_QPS.scatter(
-        mcperf_df["timestamp"], mcperf_df["qps"], color="tab:orange", label="QPS"
+    artistA_QPS = axA_QPS.plot(
+        (mcperf_df["ts_start_ms"] - min_start_ms) / 1000, mcperf_df["qps"], color="tab:orange", label="QPS"
     )
 
     # Add legend with SLO line included
     axA_QPS.legend(
-        [artistA_QPS, artistA_95p, slo_line],
+        [artistA_QPS[0], artistA_95p, slo_line],
         ["QPS", "95 percentile latency", "SLO (1ms)"],
         loc="upper right",
     )
@@ -389,7 +396,7 @@ def create_plots(run_number):
 
 
 # Run the visualization for all three runs
-for run in [1]:
+for run in [1,2,3]:
     print(f"\nProcessing run {run}...")
     create_plots(run)
 
