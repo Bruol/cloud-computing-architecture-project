@@ -224,7 +224,7 @@ def create_plots(run_number):
     # Scale QPS axis appropriately
     # max_qps = max(40000, mcperf_df["qps"].max() * 1.1)
     axA_QPS.set_ylim([29000, 31000])
-    axA_QPS.set_yticks(np.arange(29000, 31001, 500))
+    axA_QPS.set_yticks(np.arange(29000, 31001, 1000))
     axA_QPS.yaxis.set_major_formatter(
         FuncFormatter(lambda x_val, tick_pos: "{:.0f}k".format(x_val / 1000))
     )
