@@ -354,10 +354,10 @@ def create_plots(run_number):
     # Add label for first job start
     ax_events.text(
         0,
-        -0.5,
+        len(displayed_workloads),  # Position above the top workload
         "First Job Start",
         ha="center",
-        va="top",
+        va="bottom",  # Changed to bottom alignment
         fontsize=8,
         bbox=dict(
             facecolor="white", alpha=0.8, edgecolor="black", boxstyle="round,pad=0.3"
@@ -389,7 +389,7 @@ def create_plots(run_number):
 
 
 # Run the visualization for all three runs
-for run in [1, 2, 3]:
+for run in [1]:
     print(f"\nProcessing run {run}...")
     create_plots(run)
 
