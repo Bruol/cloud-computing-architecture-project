@@ -1,6 +1,6 @@
-
 from job import JobInfo, JobInstance
 from typing import List, Optional
+
 
 class Policy:
     def __init__(self):
@@ -11,4 +11,3 @@ class Policy:
 
     def add_job(self, job: JobInfo):
         raise NotImplementedError("Subclasses must implement this method")
-    

@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 Job = Union[str, list[str], JobEnum]
 JobInfo = Dict[str, Job]
 
+
 class JobStatus(enum.Enum):
     PENDING = "pending"
     RUNNING = "running"
@@ -23,9 +24,10 @@ class JobStatus(enum.Enum):
     COMPLETED = "completed"
     ERROR = "error"
 
+
 class JobManager:
     _instance = None
-    _jobs: List['JobInstance'] = []
+    _jobs: List["JobInstance"] = []
 
     def __new__(cls):
         if cls._instance is None:
@@ -35,10 +37,10 @@ class JobManager:
             signal.signal(signal.SIGTERM, cls._instance._handle_interrupt)
         return cls._instance
 
-    def register_job(self, job: 'JobInstance'):
+    def register_job(self, job: "JobInstance"):
         self._jobs.append(job)
 
-    def unregister_job(self, job: 'JobInstance'):
+    def unregister_job(self, job: "JobInstance"):
         if job in self._jobs:
             self._jobs.remove(job)
 
@@ -54,8 +56,18 @@ class JobManager:
             except Exception as e:
                 logger.error(f"Error cleaning up job {job._jobName}: {str(e)}")
 
+
 class JobInstance:
-    def __init__(self, jobName: str, image: str, command: list[str], threads: int, schedulerLogger: SchedulerLogger, job: JobEnum, docker_client: DockerClient = docker.from_env()):
+    def __init__(
+        self,
+        jobName: str,
+        image: str,
+        command: list[str],
+        threads: int,
+        schedulerLogger: SchedulerLogger,
+        job: JobEnum,
+        docker_client: DockerClient = docker.from_env(),
+    ):
         self._jobName = jobName
         self._job = job
         self._image = image
@@ -91,14 +103,17 @@ class JobInstance:
     def __del__(self):
         self.cleanup()
 
-
     def start_job(self, cores: str):
         # return the container
         # docker run --cpuset-cpus="0" -d --rm --name parsec anakli/cca:parsec_blackscholes ./run -a run -S parsec -p blackscholes -i native -n 2
-        
+
         if self._error_count > 3:
-            logger.error(f"Job {self._jobName} failed {self._error_count} times, skipping")
-            raise Exception(f"Job {self._jobName} failed {self._error_count} times, skipping")
+            logger.error(
+                f"Job {self._jobName} failed {self._error_count} times, skipping"
+            )
+            raise Exception(
+                f"Job {self._jobName} failed {self._error_count} times, skipping"
+            )
 
         command = []
         for arg in self._command:
@@ -106,33 +121,31 @@ class JobInstance:
                 command.append(arg.format(threads=self._threads))
             except:
                 command.append(arg)
-        
+
         container = self._docker_client.containers.run(
             self._image,
             command,
             cpuset_cpus=cores,
             name=f"{self._jobName}",
-            detach=True
+            detach=True,
         )
 
-
-        logger.info(f"Job {self._jobName} started with cores {cores} and {self._threads} threads")        
-        self._schedulerLogger.job_start(self._job, cores.split(','), self._threads)
+        logger.info(
+            f"Job {self._jobName} started with cores {cores} and {self._threads} threads"
+        )
+        self._schedulerLogger.job_start(self._job, cores.split(","), self._threads)
         self._container = container
         self._status = JobStatus.RUNNING
         self._start_time = time.time()
-
-
 
     def pause_job(self):
         # pause the job
         if self._container is None or self._status != JobStatus.RUNNING:
             raise ValueError(f"Job {self._jobName} is not running")
-        self._container.pause()  
+        self._container.pause()
         logger.info(f"Job {self._jobName} paused")
         self._schedulerLogger.job_pause(self._job)
         self._status = JobStatus.PAUSED
-    
 
     def unpause_job(self):
         # unpause the job
@@ -149,15 +162,14 @@ class JobInstance:
             raise ValueError(f"Job {self._jobName} is not running")
         self._container.update(cpuset_cpus=cores)
         logger.info(f"Job {self._jobName} updated to cores {cores}")
-        self._schedulerLogger.update_cores(self._job, cores.split(','))
-    
+        self._schedulerLogger.update_cores(self._job, cores.split(","))
 
     def check_job_completed(self):
         # check if the job is completed
         if self._container is None:
             raise ValueError(f"Job {self._jobName} is not running")
-        
-        container_logs = self._container.logs().decode('utf-8')
+
+        container_logs = self._container.logs().decode("utf-8")
 
         done = "[PARSEC] Done." in container_logs
         error = "Error" in container_logs
@@ -165,7 +177,9 @@ class JobInstance:
         if done and not error:
             self._status = JobStatus.COMPLETED
             self._end_time = time.time()
-            logger.info(f"Job {self._jobName} completed in {self._end_time - self._start_time} seconds")
+            logger.info(
+                f"Job {self._jobName} completed in {self._end_time - self._start_time} seconds"
+            )
             self._schedulerLogger.job_end(self._job)
         elif error:
             self._status = JobStatus.ERROR
@@ -174,11 +188,12 @@ class JobInstance:
             self._container = None
         elif self._container is None:
             self._status = JobStatus.PENDING
-        
+
         if self._status == JobStatus.ERROR:
-            logger.error(f"Job {self._jobName} failed {self._error_count} times, marking as error")
+            logger.error(
+                f"Job {self._jobName} failed {self._error_count} times, marking as error"
+            )
         else:
             logger.info(f"Job {self._jobName} status: {self._status}")
-        
+
         return self._status
-    
