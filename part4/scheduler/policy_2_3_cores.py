@@ -13,6 +13,7 @@ from policy import Policy
 
 logger = logging.getLogger(__name__)
 
+
 class Policy2And3Cores(Policy):
     def __init__(self):
         self.two_core_queue: List[JobInstance] = []
@@ -24,7 +25,12 @@ class Policy2And3Cores(Policy):
 
     def add_job(self, job: JobInfo):
         """Add a job to the appropriate queue based on its paralellizability."""
-        job_instance = JobInstance(job["name"], job["image"], job["command"], 2 if job["paralellizability"] == 1 else 3)
+        job_instance = JobInstance(
+            job["name"],
+            job["image"],
+            job["command"],
+            2 if job["paralellizability"] == 1 else 3,
+        )
         if job["paralellizability"] == 1:
             self.two_core_queue.append(job_instance)
         elif job["paralellizability"] == 2:
@@ -40,24 +46,41 @@ class Policy2And3Cores(Policy):
         # Check for completed jobs and free up cores
         self._check_completed_jobs()
 
-        if len(self.two_core_queue) == 0 and len(self.three_core_queue) == 0 and self.running_two_core is None and self.running_three_core is None:
+        if (
+            len(self.two_core_queue) == 0
+            and len(self.three_core_queue) == 0
+            and self.running_two_core is None
+            and self.running_three_core is None
+        ):
             self.isCompleted = True
             return
-        
+
         # Sort available cores
         sorted_cores = sorted(available_cores)
 
         if len(available_cores) == 2:
             # If both queues are empty and there's a running job, give it all cores
             if len(self.two_core_queue) == 0 and len(self.three_core_queue) == 0:
-                if self.running_two_core is None and self.running_three_core and self.running_three_core._status != JobStatus.COMPLETED:
-                    self.running_three_core.update_job_cpus(f"{sorted_cores[0]},{sorted_cores[1]}")
+                if (
+                    self.running_two_core is None
+                    and self.running_three_core
+                    and self.running_three_core._status != JobStatus.COMPLETED
+                ):
+                    self.running_three_core.update_job_cpus(
+                        f"{sorted_cores[0]},{sorted_cores[1]}"
+                    )
                     try:
                         self.running_three_core.unpause_job()
                     except Exception as e:
                         logger.warning(f"Error unpausing 3-core job: {e}")
-                elif self.running_three_core is None and self.running_two_core and self.running_two_core._status != JobStatus.COMPLETED:
-                    self.running_two_core.update_job_cpus(f"{sorted_cores[0]},{sorted_cores[1]}")
+                elif (
+                    self.running_three_core is None
+                    and self.running_two_core
+                    and self.running_two_core._status != JobStatus.COMPLETED
+                ):
+                    self.running_two_core.update_job_cpus(
+                        f"{sorted_cores[0]},{sorted_cores[1]}"
+                    )
                     try:
                         self.running_two_core.unpause_job()
                     except Exception as e:
@@ -65,32 +88,54 @@ class Policy2And3Cores(Policy):
                 return
 
             # Pause running 3-core job if exists
-            if self.running_three_core and self.running_three_core._status == JobStatus.RUNNING:
+            if (
+                self.running_three_core
+                and self.running_three_core._status == JobStatus.RUNNING
+            ):
                 self.running_three_core.pause_job()
-                
+
             # Start new 2-core job if none running
             if self.running_two_core is None:
                 if len(self.two_core_queue) > 0:
                     self.running_two_core = self.two_core_queue.pop(0)
-                    self.running_two_core.start_job(f"{sorted_cores[0]},{sorted_cores[1]}")
+                    self.running_two_core.start_job(
+                        f"{sorted_cores[0]},{sorted_cores[1]}"
+                    )
                 elif len(self.three_core_queue) > 0:
                     # If no 2-core jobs, run a 3-core job on 2 cores
                     self.running_two_core = self.three_core_queue.pop(0)
-                    self.running_two_core.start_job(f"{sorted_cores[0]},{sorted_cores[1]}")
-            elif self.running_two_core and self.running_two_core._status == JobStatus.PAUSED:
+                    self.running_two_core.start_job(
+                        f"{sorted_cores[0]},{sorted_cores[1]}"
+                    )
+            elif (
+                self.running_two_core
+                and self.running_two_core._status == JobStatus.PAUSED
+            ):
                 self.running_two_core.unpause_job()
-            
+
         elif len(available_cores) == 3:
             # If both queues are empty and there's a running job, give it all cores
             if len(self.two_core_queue) == 0 and len(self.three_core_queue) == 0:
-                if self.running_two_core is None and self.running_three_core and self.running_three_core._status != JobStatus.COMPLETED:
-                    self.running_three_core.update_job_cpus(f"{sorted_cores[0]},{sorted_cores[1]},{sorted_cores[2]}")
+                if (
+                    self.running_two_core is None
+                    and self.running_three_core
+                    and self.running_three_core._status != JobStatus.COMPLETED
+                ):
+                    self.running_three_core.update_job_cpus(
+                        f"{sorted_cores[0]},{sorted_cores[1]},{sorted_cores[2]}"
+                    )
                     try:
                         self.running_three_core.unpause_job()
                     except Exception as e:
                         logger.warning(f"Error unpausing 3-core job: {e}")
-                elif self.running_three_core is None and self.running_two_core and self.running_two_core._status != JobStatus.COMPLETED:
-                    self.running_two_core.update_job_cpus(f"{sorted_cores[0]},{sorted_cores[1]},{sorted_cores[2]}")
+                elif (
+                    self.running_three_core is None
+                    and self.running_two_core
+                    and self.running_two_core._status != JobStatus.COMPLETED
+                ):
+                    self.running_two_core.update_job_cpus(
+                        f"{sorted_cores[0]},{sorted_cores[1]},{sorted_cores[2]}"
+                    )
                     try:
                         self.running_two_core.unpause_job()
                     except Exception as e:
@@ -98,19 +143,29 @@ class Policy2And3Cores(Policy):
                 return
 
             # Pause running 2-core job if exists
-            if self.running_two_core and self.running_two_core._status == JobStatus.RUNNING:
+            if (
+                self.running_two_core
+                and self.running_two_core._status == JobStatus.RUNNING
+            ):
                 self.running_two_core.pause_job()
-                
+
             # Start new 3-core job if none running
             if self.running_three_core is None:
                 if len(self.three_core_queue) > 0:
                     self.running_three_core = self.three_core_queue.pop(0)
-                    self.running_three_core.start_job(f"{sorted_cores[0]},{sorted_cores[1]},{sorted_cores[2]}")
+                    self.running_three_core.start_job(
+                        f"{sorted_cores[0]},{sorted_cores[1]},{sorted_cores[2]}"
+                    )
                 elif len(self.two_core_queue) > 0:
                     # If no 3-core jobs, run a 2-core job on 3 cores
                     self.running_three_core = self.two_core_queue.pop(0)
-                    self.running_three_core.start_job(f"{sorted_cores[0]},{sorted_cores[1]},{sorted_cores[2]}")
-            elif self.running_three_core and self.running_three_core._status == JobStatus.PAUSED:
+                    self.running_three_core.start_job(
+                        f"{sorted_cores[0]},{sorted_cores[1]},{sorted_cores[2]}"
+                    )
+            elif (
+                self.running_three_core
+                and self.running_three_core._status == JobStatus.PAUSED
+            ):
                 self.running_three_core.unpause_job()
 
         return
@@ -132,4 +187,3 @@ class Policy2And3Cores(Policy):
             elif status == JobStatus.ERROR:
                 self.three_core_queue.append(self.running_three_core)
                 self.running_three_core = None
-

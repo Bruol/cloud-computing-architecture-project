@@ -4,11 +4,12 @@ import psutil
 import time
 import sys
 
+
 def measure_cpu_usage(file_name: str = "cpuUsage.csv"):
     print("Timestamp, CPU Usage, Memory Usage")
     try:
         with open(file_name, "w") as f:
-            while True: 
+            while True:
                 output = f"{int(time.time())}, {psutil.cpu_percent(interval=1, percpu=True)}, {psutil.virtual_memory().percent}\n"
                 f.write(output)
                 f.flush()
