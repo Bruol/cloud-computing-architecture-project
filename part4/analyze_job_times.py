@@ -19,6 +19,8 @@ WORKLOAD_COLORS = {
     "vips": "#CC0A00",  # Bright red
 }
 
+DURATION_MARGIN = 60
+
 def ensure_directory_exists(directory_path):
     """Create directory if it doesn't exist."""
     if not os.path.exists(directory_path):
@@ -294,9 +296,9 @@ def create_plots_A(input_directory_path, policy_number, run_number, save_folder_
 
     # Upper subplot: P95 latency and QPS
     axA_95p.set_title(f"{run_number}A")
-    axA_95p.set_xlim([0, duration])
+    axA_95p.set_xlim([0, duration + DURATION_MARGIN])
     axA_95p.set_xlabel("Time [s]")
-    axA_95p.set_xticks(np.arange(0, duration + 1, 50))
+    axA_95p.set_xticks(np.arange(0, duration + DURATION_MARGIN, 50))
     axA_95p.grid(True, alpha=0.3)
     axA_95p.set_ylabel("95th Percentile Latency [ms]")
     axA_95p.tick_params(axis="y", labelcolor="tab:blue")
@@ -343,8 +345,8 @@ def create_plots_A(input_directory_path, policy_number, run_number, save_folder_
     )
 
     # Lower subplot: Job timeline
-    ax_events.set_xlim([0, duration])
-    ax_events.set_xticks(np.arange(0, duration + 1, 50))
+    ax_events.set_xlim([0, duration + DURATION_MARGIN])
+    ax_events.set_xticks(np.arange(0, duration + DURATION_MARGIN, 50))
     ax_events.grid(True, alpha=0.3)
 
     # Prepare workloads list for y-axis
@@ -483,9 +485,9 @@ def create_plots_B(input_directory_path, policy_number, run_number, save_folder_
 
     # Upper subplot: P95 latency and QPS
     ax_cpu.set_title(f"{run_number}B")
-    ax_cpu.set_xlim([0, duration])
+    ax_cpu.set_xlim([0, duration + DURATION_MARGIN])
     ax_cpu.set_xlabel("Time [s]")
-    ax_cpu.set_xticks(np.arange(0, duration + 1, 50))
+    ax_cpu.set_xticks(np.arange(0, duration + DURATION_MARGIN, 50))
     ax_cpu.grid(True, alpha=0.3)
     ax_cpu.set_ylabel("Number of CPU Cores in use by Memcached")
     ax_cpu.tick_params(axis="y", labelcolor="tab:blue")
@@ -528,8 +530,8 @@ def create_plots_B(input_directory_path, policy_number, run_number, save_folder_
     )
 
     # Lower subplot: Job timeline
-    ax_events.set_xlim([0, duration])
-    ax_events.set_xticks(np.arange(0, duration + 1, 50))
+    ax_events.set_xlim([0, duration + DURATION_MARGIN])
+    ax_events.set_xticks(np.arange(0, duration + DURATION_MARGIN, 50))
     ax_events.grid(True, alpha=0.3)
 
     # Prepare workloads list for y-axis
@@ -617,13 +619,15 @@ def create_plots_B(input_directory_path, policy_number, run_number, save_folder_
 
 def main():
     # Run the visualization for all three runs
-    # input_directory_path_4_3 = "part4/part4_3_logs"
-    # output_directory_path_4_3 = "part4/plots/part_4_3"
+    input_directory_path_4_3 = "part4/part4_3_logs"
+    output_directory_path_4_3 = "part4/plots/part_4_3"
 
     input_directory_path_4_4_9s = "part4/part4_4_logs/9s_interval"
     output_directory_path_4_4_9s = "part4/plots/part_4_4/9s_interval"
     # input_directory_path_4_4_5s = "part4/part4_4_logs/5s_interval"
     # output_directory_path_4_4_5s = "part4/plots/part_4_4/5s_interval"
+    input_directory_path_4_4_7s = "part4/part4_4_logs/7s_interval"
+    output_directory_path_4_4_7s = "part4/plots/part_4_4/7s_interval"
 
     # Create output directories
     ensure_directory_exists(output_directory_path_4_4_9s)
@@ -631,13 +635,14 @@ def main():
 
     for run in [1, 2, 3]:
         print(f"\nProcessing run {run}...")
-        # create_plots_A(input_directory_path_4_3, 1, run, output_directory_path_4_3)
-        # create_plots_B(input_directory_path_4_3, 1, run, output_directory_path_4_3)
+        create_plots_A(input_directory_path_4_3, 1, run, output_directory_path_4_3)
+        create_plots_B(input_directory_path_4_3, 1, run, output_directory_path_4_3)
         create_plots_A(input_directory_path_4_4_9s, 1, run, output_directory_path_4_4_9s)
         create_plots_B(input_directory_path_4_4_9s, 1, run, output_directory_path_4_4_9s)
         # create_plots_A(input_directory_path_4_4_5s, 1, run, output_directory_path_4_4_5s)
         # create_plots_B(input_directory_path_4_4_5s, 1, run, output_directory_path_4_4_5s)
-
+        create_plots_A(input_directory_path_4_4_7s, 1, run, output_directory_path_4_4_7s)
+        create_plots_B(input_directory_path_4_4_7s, 1, run, output_directory_path_4_4_7s)
 
 
 if __name__ == "__main__":
