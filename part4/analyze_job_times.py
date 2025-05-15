@@ -19,6 +19,12 @@ WORKLOAD_COLORS = {
     "vips": "#CC0A00",  # Bright red
 }
 
+def ensure_directory_exists(directory_path):
+    """Create directory if it doesn't exist."""
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)
+        print(f"Created directory: {directory_path}")
+
 def parse_mcperf_data(file_path):
     """Parse mcperf data into a pandas DataFrame."""
     data = []
@@ -245,7 +251,7 @@ def process_cpu_usage_of_memcached(file_path):
 def create_plots_A(input_directory_path, policy_number, run_number, save_folder_path):
     mcperf_file = os.path.join(input_directory_path, f"mcperf_policy{policy_number}_run{run_number}.log")
     scheduler_file = os.path.join(input_directory_path, f"job_times/job_start_end_times/job_times_policy{policy_number}_run{run_number}.csv")
-
+    
     if not os.path.exists(mcperf_file) or not os.path.exists(scheduler_file):
         print(f"Missing files for run {run_number}. Skipping.")
         return
@@ -611,18 +617,26 @@ def create_plots_B(input_directory_path, policy_number, run_number, save_folder_
 
 def main():
     # Run the visualization for all three runs
-    input_directory_path_4_3 = "part4/part4_3_logs"
-    output_directory_path_4_3 = "part4/plots/part_4_3"
+    # input_directory_path_4_3 = "part4/part4_3_logs"
+    # output_directory_path_4_3 = "part4/plots/part_4_3"
 
-    input_directory_path_4_4 = "part4/part4_4_logs"
-    output_directory_path_4_4 = "part4/plots/part_4_4"
+    input_directory_path_4_4_9s = "part4/part4_4_logs/9s_interval"
+    output_directory_path_4_4_9s = "part4/plots/part_4_4/9s_interval"
+    # input_directory_path_4_4_5s = "part4/part4_4_logs/5s_interval"
+    # output_directory_path_4_4_5s = "part4/plots/part_4_4/5s_interval"
+
+    # Create output directories
+    ensure_directory_exists(output_directory_path_4_4_9s)
+    # ensure_directory_exists(output_directory_path_4_4_5s)
 
     for run in [1, 2, 3]:
         print(f"\nProcessing run {run}...")
-        create_plots_A(input_directory_path_4_3, 1, run, output_directory_path_4_3)
-        create_plots_B(input_directory_path_4_3, 1, run, output_directory_path_4_3)
-        create_plots_A(input_directory_path_4_4, 1, run, output_directory_path_4_4)
-        create_plots_B(input_directory_path_4_4, 1, run, output_directory_path_4_4)
+        # create_plots_A(input_directory_path_4_3, 1, run, output_directory_path_4_3)
+        # create_plots_B(input_directory_path_4_3, 1, run, output_directory_path_4_3)
+        create_plots_A(input_directory_path_4_4_9s, 1, run, output_directory_path_4_4_9s)
+        create_plots_B(input_directory_path_4_4_9s, 1, run, output_directory_path_4_4_9s)
+        # create_plots_A(input_directory_path_4_4_5s, 1, run, output_directory_path_4_4_5s)
+        # create_plots_B(input_directory_path_4_4_5s, 1, run, output_directory_path_4_4_5s)
 
 
 

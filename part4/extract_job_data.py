@@ -278,25 +278,46 @@ def extract_job_stats_to_csv_all(input_directory_path, output_directory_path):
 
     print(f"END: Job execution times statistics calculated and written to CSV files.")
 
+def create_required_directories(output_directory_path):
+    """Creates all necessary directories for output files."""
+    required_dirs = [
+        os.path.join(output_directory_path, "job_start_end_times"),
+        os.path.join(output_directory_path, "memcached_cpu_usage"),
+        os.path.join(output_directory_path, "job_exec_times"),
+        os.path.join(output_directory_path, "job_stat_exec_times")
+    ]
+    
+    for directory in required_dirs:
+        os.makedirs(directory, exist_ok=True)
+        print(f"Ensured directory exists: {directory}")
 
 def main():
-    log_directory_path_4_3 = "part4/part4_3_logs"
-    log_directory_path_4_4 = "part4/part4_4_logs"
+    # log_directory_path_4_3 = "part4/part4_3_logs"
+    # log_directory_path_4_4_5s = "part4/part4_4_logs/5s_interval"
+    log_directory_path_4_4_9s = "part4/part4_4_logs/9s_interval"
 
-    output_directory_path_4_3 = "part4/part4_3_logs/job_times"
-    output_directory_parth_4_4 = "part4/part4_4_logs/job_times"
+    # output_directory_path_4_3 = "part4/part4_3_logs/job_times"
+    # output_directory_path_4_4_5s = "part4/part4_4_logs/5s_interval/job_times"
+    output_directory_path_4_4_9s = "part4/part4_4_logs/9s_interval/job_times"
 
-    extract_job_times_to_csv_all(log_directory_path_4_3, output_directory_path_4_3)
-    extract_job_times_to_csv_all(log_directory_path_4_4, output_directory_parth_4_4)
+    # Create necessary directories
+    create_required_directories(output_directory_path_4_4_9s)
 
-    extract_memcached_cores_usage_to_csv_all(log_directory_path_4_3, output_directory_path_4_3)
-    extract_memcached_cores_usage_to_csv_all(log_directory_path_4_4, output_directory_parth_4_4)
+    # extract_job_times_to_csv_all(log_directory_path_4_3, output_directory_path_4_3)
+    # extract_job_times_to_csv_all(log_directory_path_4_4_5s, output_directory_path_4_4_5s)
+    extract_job_times_to_csv_all(log_directory_path_4_4_9s, output_directory_path_4_4_9s)
 
-    extract_job_exec_times_to_csv_all(log_directory_path_4_3, output_directory_path_4_3)
-    extract_job_exec_times_to_csv_all(log_directory_path_4_4, output_directory_parth_4_4)
+    # extract_memcached_cores_usage_to_csv_all(log_directory_path_4_3, output_directory_path_4_3)
+    # extract_memcached_cores_usage_to_csv_all(log_directory_path_4_4_5s, output_directory_path_4_4_5s)
+    extract_memcached_cores_usage_to_csv_all(log_directory_path_4_4_9s, output_directory_path_4_4_9s)
 
-    extract_job_stats_to_csv_all(log_directory_path_4_3, output_directory_path_4_3)
-    extract_job_stats_to_csv_all(log_directory_path_4_4, output_directory_parth_4_4)
+    # extract_job_exec_times_to_csv_all(log_directory_path_4_3, output_directory_path_4_3)
+    # extract_job_exec_times_to_csv_all(log_directory_path_4_4_5s, output_directory_path_4_4_5s)
+    extract_job_exec_times_to_csv_all(log_directory_path_4_4_9s, output_directory_path_4_4_9s)
+
+    # extract_job_stats_to_csv_all(log_directory_path_4_3, output_directory_path_4_3)
+    # extract_job_stats_to_csv_all(log_directory_path_4_4_5s, output_directory_path_4_4_5s)
+    extract_job_stats_to_csv_all(log_directory_path_4_4_9s, output_directory_path_4_4_9s)
 
 if __name__ == "__main__":
     main()
