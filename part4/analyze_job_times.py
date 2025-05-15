@@ -619,26 +619,26 @@ def create_plots_B(input_directory_path, policy_number, run_number, save_folder_
 
 def main():
     # Run the visualization for all three runs
-    input_directory_path_4_3 = "part4/part4_3_logs"
-    output_directory_path_4_3 = "part4/plots/part_4_3"
+    # input_directory_path_4_3 = "part4/part4_3_logs"
+    # output_directory_path_4_3 = "part4/plots/part_4_3"
 
-    input_directory_path_4_4_9s = "part4/part4_4_logs/9s_interval"
-    output_directory_path_4_4_9s = "part4/plots/part_4_4/9s_interval"
+    # input_directory_path_4_4_9s = "part4/part4_4_logs/9s_interval"
+    # output_directory_path_4_4_9s = "part4/plots/part_4_4/9s_interval"
     # input_directory_path_4_4_5s = "part4/part4_4_logs/5s_interval"
     # output_directory_path_4_4_5s = "part4/plots/part_4_4/5s_interval"
     input_directory_path_4_4_7s = "part4/part4_4_logs/7s_interval"
     output_directory_path_4_4_7s = "part4/plots/part_4_4/7s_interval"
 
     # Create output directories
-    ensure_directory_exists(output_directory_path_4_4_9s)
+    # ensure_directory_exists(output_directory_path_4_4_9s)
     # ensure_directory_exists(output_directory_path_4_4_5s)
 
     for run in [1, 2, 3]:
         print(f"\nProcessing run {run}...")
-        create_plots_A(input_directory_path_4_3, 1, run, output_directory_path_4_3)
-        create_plots_B(input_directory_path_4_3, 1, run, output_directory_path_4_3)
-        create_plots_A(input_directory_path_4_4_9s, 1, run, output_directory_path_4_4_9s)
-        create_plots_B(input_directory_path_4_4_9s, 1, run, output_directory_path_4_4_9s)
+        # create_plots_A(input_directory_path_4_3, 1, run, output_directory_path_4_3)
+        # create_plots_B(input_directory_path_4_3, 1, run, output_directory_path_4_3)
+        # create_plots_A(input_directory_path_4_4_9s, 1, run, output_directory_path_4_4_9s)
+        # create_plots_B(input_directory_path_4_4_9s, 1, run, output_directory_path_4_4_9s)
         # create_plots_A(input_directory_path_4_4_5s, 1, run, output_directory_path_4_4_5s)
         # create_plots_B(input_directory_path_4_4_5s, 1, run, output_directory_path_4_4_5s)
         create_plots_A(input_directory_path_4_4_7s, 1, run, output_directory_path_4_4_7s)
