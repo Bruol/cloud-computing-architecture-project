@@ -39,3 +39,28 @@ Our scheduling strategy balances workload characteristics with node capabilities
 - CPU pinning using `taskset` isolates workloads on specific cores.
 - A controller script orchestrates the sequential execution of batch applications.
 - Resource requests/limits enforce proper resource allocation for each application.
+
+## Usage
+
+1. Set up the Kubernetes cluster with the specified VMs from the project instructions.
+
+2. Install the mcperf client on the measure machine:
+  
+```bash
+./install_mcperf.sh
+```
+
+3. Run the experiment:
+  
+```bash
+./part3_experiment.sh 1
+```
+
+4. The logs and results will be saved in the `logs` directory. We have logs folder with all different runs of the experiments and `part_3_results_group_020` folder with the final results of the experiments.
+
+5. Analyze the logs and print some statistics:
+  - Job completion times - `python3 analyze_job_times.py`
+  - SLO violations - `python3 analyze_slo.py`
+
+6. After the satisfactory statistics, we can plot the results.
+  - `python3 vis_plots.py`
