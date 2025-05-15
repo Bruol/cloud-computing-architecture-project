@@ -30,26 +30,11 @@ def parse_mcperf_data(file_path):
         interval_string = interval_line.split("=")[1].strip().split(" ", 1)
         
         number_of_intervals = int(interval_string[0])
-        # qps = interval_string[1][1:-1].split(",")
-        # qps = [int(qp) for qp in qps]
-        # print("Number of intervals:", number_of_intervals)
-        # print("QPS:", len(qps))
 
         file.readline()
         timestamp_start_ms = int(file.readline().split(":")[1].strip())
         timestamp_end_ms = int(file.readline().split(":")[1].strip())
         timestamp_delta_ms = (timestamp_end_ms - timestamp_start_ms) / 130
-        # print("Timestamp delta:", timestamp_delta)
-        # print("Timestamp start:", timestamp_start)
-        # print("Timestamp end:", timestamp_end)
-
-        # timestamps = [(timestamp_start + i * timestamp_delta) / 1000 for i in range(number_of_intervals)]
-        # qps_timestamps = [elem for elem in zip(timestamps, qps)]
-        # print("QPS timestamps:", qps_timestamps)
-
-        # Get 95th percentile and their timestamps
-        qps_list = []
-        latency_95th_list = []
 
         file.readline()
         file.readline()
@@ -275,7 +260,7 @@ def create_plots_A(input_directory_path, policy_number, run_number, save_folder_
 
     # Print some debug info
     print(
-        f"Run {run_number}: Found {len(mcperf_df)} mcperf data points and {len(events_df) // 2} jobs"
+        f"Run {run_number}: Found {len(mcperf_df)} mcperf data points"
     )
 
     # Convert timestamps to seconds relative to first job start
@@ -429,7 +414,7 @@ def create_plots_A(input_directory_path, policy_number, run_number, save_folder_
 
     # Print summary statistics
     if not mcperf_df.empty:
-        slo_violations = sum(mcperf_df["p95_ms"] > 1.0)
+        slo_violations = sum(mcperf_df["p95_ms"] > 0.8)
 
         print(f"  Total measurements: {len(mcperf_df)}")
         print(
@@ -459,8 +444,7 @@ def create_plots_B(input_directory_path, policy_number, run_number, save_folder_
 
     # Print some debug info
     print(
-        f"Run {run_number}: Found {len(mcperf_df)} mcperf data points, \
-        {len(cpu_usage_df)} Memcached CPU usage data points and {len(events_df) // 2} jobs"
+        f"Run {run_number}: Found {len(mcperf_df)} mcperf data points"
     )
 
     # Convert timestamps to seconds relative to first job start
@@ -615,7 +599,7 @@ def create_plots_B(input_directory_path, policy_number, run_number, save_folder_
 
     # Print summary statistics
     if not mcperf_df.empty:
-        slo_violations = sum(mcperf_df["p95_ms"] > 1.0)
+        slo_violations = sum(mcperf_df["p95_ms"] > 0.8)
 
         print(f"  Total measurements: {len(mcperf_df)}")
         print(
