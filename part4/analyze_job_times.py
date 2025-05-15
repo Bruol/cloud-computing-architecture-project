@@ -40,7 +40,7 @@ def parse_mcperf_data(file_path):
         file.readline()
         timestamp_start_ms = int(file.readline().split(":")[1].strip())
         timestamp_end_ms = int(file.readline().split(":")[1].strip())
-        timestamp_delta_ms = (timestamp_end_ms - timestamp_start_ms) / 130
+        timestamp_delta_ms = (timestamp_end_ms - timestamp_start_ms) / number_of_intervals
 
         file.readline()
         file.readline()
