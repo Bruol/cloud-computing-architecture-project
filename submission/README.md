@@ -82,4 +82,5 @@ The scheduler can be found in the `part4/scheduler` directory.
 
 part4_x are run on my laptop which uses ssh to start the experiments. The script names are according to the subtask number.
 
-In the `part4/visualization` directory you can find the code to visualize the results and analyze the log files.
+In the `part4/visualization` directory you can find two scripts to extract the data from the logs and plot the results.
+The `extract_job_data.py` script extracts the data from the logs and the `analyze_job_times.py` script plots the results of the experiments.
